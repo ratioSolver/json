@@ -9,6 +9,11 @@
 
 namespace json
 {
+  class bool_val;
+  class string_val;
+  class int_val;
+  class float_val;
+  class null_val;
   class object;
   class array;
 
@@ -20,6 +25,13 @@ namespace json
   public:
     JSON_EXPORT json();
     JSON_EXPORT json(json &&orig);
+    JSON_EXPORT json(object &&orig);
+    JSON_EXPORT json(array &&orig);
+    JSON_EXPORT json(bool_val &&orig);
+    JSON_EXPORT json(string_val &&orig);
+    JSON_EXPORT json(int_val &&orig);
+    JSON_EXPORT json(float_val &&orig);
+    JSON_EXPORT json(null_val &&orig);
 
     JSON_EXPORT void operator=(bool val);
     JSON_EXPORT void operator=(const std::string &str);
@@ -42,8 +54,11 @@ namespace json
 
   class object : public json
   {
+    friend class json;
+
   public:
     JSON_EXPORT object();
+    JSON_EXPORT object(std::map<std::string, json> &&vals);
 
     json &operator[](const std::string &str) override { return vals[str]; }
 
@@ -56,8 +71,11 @@ namespace json
 
   class array : public json
   {
+    friend class json;
+
   public:
     JSON_EXPORT array();
+    JSON_EXPORT array(std::vector<json> &&vs);
 
     inline void reserve(size_t size) { vals.reserve(size); }
 
@@ -78,6 +96,8 @@ namespace json
 
   class bool_val : public json
   {
+    friend class json;
+
   public:
     JSON_EXPORT bool_val(const bool &val);
 
@@ -92,6 +112,8 @@ namespace json
 
   class string_val : public json
   {
+    friend class json;
+
   public:
     JSON_EXPORT string_val(const std::string &val);
 
@@ -106,6 +128,8 @@ namespace json
 
   class int_val : public json
   {
+    friend class json;
+
   public:
     JSON_EXPORT int_val(const long &val);
 
@@ -120,6 +144,8 @@ namespace json
 
   class float_val : public json
   {
+    friend class json;
+
   public:
     JSON_EXPORT float_val(const double &val);
 
@@ -131,4 +157,15 @@ namespace json
   private:
     double val;
   };
+
+  class null_val : public json
+  {
+  public:
+    JSON_EXPORT null_val() {}
+
+  private:
+    JSON_EXPORT void dump(std::ostream &os) const noexcept override { os << "null"; }
+  };
+
+  JSON_EXPORT json load(std::istream &is);
 } // namespace json

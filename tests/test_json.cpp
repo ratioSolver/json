@@ -1,6 +1,7 @@
 #include "json.h"
+#include <sstream>
 
-int main(int, char **)
+void test_json_0()
 {
     json::json o1;
     o1["a"] = 5l;
@@ -18,4 +19,17 @@ int main(int, char **)
     o1["c"] = std::move(arr);
 
     std::string js = o1.dump();
+}
+
+void test_json_1()
+{
+    std::stringstream s("{\"a\": \"a\", \"b\": 1, \"c\": 1.500000, \"d\": true, \"e\": [true, false], \"f\": null, \"g\": {\"a\": true, \"b\": 1}}");
+    json::json j_obj = json::load(s);
+    std::string js = j_obj.dump();
+}
+
+int main(int, char **)
+{
+    test_json_0();
+    test_json_1();
 }
