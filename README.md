@@ -1,2 +1,3 @@
-# json
+# JSON
+
 A very simple JSON library
