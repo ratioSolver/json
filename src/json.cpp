@@ -6,19 +6,33 @@ namespace json
     inline char get_char(std::istream &is) { return static_cast<char>(is.get()); }
 
     JSON_EXPORT json::json() {}
+    JSON_EXPORT json::json(bool val) : j(new bool_val(val)) {}
+    JSON_EXPORT json::json(const std::string &str) : j(new string_val(str)) {}
+    JSON_EXPORT json::json(const char *str) : j(new string_val(str)) {}
+    JSON_EXPORT json::json(short int val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(unsigned short int val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(long long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(unsigned long long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(double val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(long double val) : j(new number_val(std::to_string(val))) {}
     JSON_EXPORT json::json(json &&orig) : j(std::move(orig.j)) {}
     JSON_EXPORT json::json(object &&orig) { j.reset(new object(std::move(orig.vals))); }
     JSON_EXPORT json::json(array &&orig) { j.reset(new array(std::move(orig.vals))); }
     JSON_EXPORT json::json(bool_val &&orig) { j.reset(new bool_val(std::move(orig.val))); }
     JSON_EXPORT json::json(string_val &&orig) { j.reset(new string_val(std::move(orig.val))); }
-    JSON_EXPORT json::json(int_val &&orig) { j.reset(new int_val(std::move(orig.val))); }
-    JSON_EXPORT json::json(float_val &&orig) { j.reset(new float_val(std::move(orig.val))); }
+    JSON_EXPORT json::json(number_val &&orig) { j.reset(new number_val(std::move(orig.val))); }
     JSON_EXPORT json::json(null_val &&) { j.reset(new null_val()); }
     JSON_EXPORT void json::operator=(bool val) { j.reset(new bool_val(val)); }
     JSON_EXPORT void json::operator=(const std::string &str) { j.reset(new string_val(str)); }
     JSON_EXPORT void json::operator=(const char *str) { j.reset(new string_val(str)); }
-    JSON_EXPORT void json::operator=(long val) { j.reset(new int_val(val)); }
-    JSON_EXPORT void json::operator=(double val) { j.reset(new float_val(val)); }
+    JSON_EXPORT void json::operator=(short int val) { j.reset(new number_val(std::to_string(val))); }
+    JSON_EXPORT void json::operator=(unsigned short int val) { j.reset(new number_val(std::to_string(val))); }
+    JSON_EXPORT void json::operator=(long val) { j.reset(new number_val(std::to_string(val))); }
+    JSON_EXPORT void json::operator=(long long val) { j.reset(new number_val(std::to_string(val))); }
+    JSON_EXPORT void json::operator=(unsigned long long val) { j.reset(new number_val(std::to_string(val))); }
+    JSON_EXPORT void json::operator=(double val) { j.reset(new number_val(std::to_string(val))); }
+    JSON_EXPORT void json::operator=(long double val) { j.reset(new number_val(std::to_string(val))); }
     JSON_EXPORT void json::operator=(json val) { j.swap(val.j); }
 
     JSON_EXPORT std::string json::dump() const noexcept
@@ -42,6 +56,15 @@ namespace json
             j = std::make_unique<array>();
         return (*j)[index];
     }
+
+    JSON_EXPORT bool_val::bool_val(const bool &val) : val(val) {}
+    JSON_EXPORT void bool_val::dump(std::ostream &os) const noexcept { os << std::boolalpha << val; }
+
+    JSON_EXPORT string_val::string_val(const std::string &val) : val(val) {}
+    JSON_EXPORT void string_val::dump(std::ostream &os) const noexcept { os << '"' << val << '"'; }
+
+    JSON_EXPORT number_val::number_val(const std::string &val) : val(val) {}
+    JSON_EXPORT void number_val::dump(std::ostream &os) const noexcept { os << val; }
 
     JSON_EXPORT object::object() {}
     JSON_EXPORT object::object(std::map<std::string, json> &&vs) : vals(std::move(vs)) {}
@@ -72,18 +95,6 @@ namespace json
         }
         os << ']';
     }
-
-    JSON_EXPORT bool_val::bool_val(const bool &val) : val(val) {}
-    JSON_EXPORT void bool_val::dump(std::ostream &os) const noexcept { os << std::boolalpha << val; }
-
-    JSON_EXPORT string_val::string_val(const std::string &val) : val(val) {}
-    JSON_EXPORT void string_val::dump(std::ostream &os) const noexcept { os << '"' << val << '"'; }
-
-    JSON_EXPORT int_val::int_val(const long &val) : val(val) {}
-    JSON_EXPORT void int_val::dump(std::ostream &os) const noexcept { os << std::to_string(val); }
-
-    JSON_EXPORT float_val::float_val(const double &val) : val(val) {}
-    JSON_EXPORT void float_val::dump(std::ostream &os) const noexcept { os << std::to_string(val); }
 
     JSON_EXPORT json load(std::istream &is)
     {
@@ -159,9 +170,9 @@ namespace json
                         num += get_char(is);
                     while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
                         num += get_char(is);
-                    return float_val(std::stod(num));
+                    return number_val(num);
                 }
-                return float_val(std::stod(num));
+                return number_val(num);
             }
             else if (is.peek() == 'e' || is.peek() == 'E')
             {
@@ -172,17 +183,29 @@ namespace json
                     num += get_char(is);
                 while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
                     num += get_char(is);
-                return float_val(std::stod(num));
+                return number_val(num);
             }
             else
-                return int_val(std::stol(num));
+                return number_val(num);
         }
         case '.':
         {
-            get_char(is);
-            long dec_part;
-            is >> dec_part;
-            return float_val(std::stod('.' + std::to_string(dec_part)));
+            std::string num;
+            num += get_char(is);
+            while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                num += get_char(is);
+            if (is.peek() == 'e' || is.peek() == 'E')
+            {
+                num += get_char(is);
+                if (is.peek() == '+')
+                    num += get_char(is);
+                if (is.peek() == '-')
+                    num += get_char(is);
+                while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                    num += get_char(is);
+                return number_val(num);
+            }
+            return number_val(num);
         }
         case 'f':
         { // we have a false literal..

@@ -11,8 +11,7 @@ namespace json
 {
   class bool_val;
   class string_val;
-  class int_val;
-  class float_val;
+  class number_val;
   class null_val;
   class object;
   class array;
@@ -24,24 +23,40 @@ namespace json
 
   public:
     JSON_EXPORT json();
+    JSON_EXPORT json(bool val);
+    JSON_EXPORT json(const std::string &str);
+    JSON_EXPORT json(const char *str);
+    JSON_EXPORT json(short int val);
+    JSON_EXPORT json(unsigned short int val);
+    JSON_EXPORT json(long val);
+    JSON_EXPORT json(long long val);
+    JSON_EXPORT json(unsigned long long val);
+    JSON_EXPORT json(double val);
+    JSON_EXPORT json(long double val);
     JSON_EXPORT json(json &&orig);
     JSON_EXPORT json(object &&orig);
     JSON_EXPORT json(array &&orig);
     JSON_EXPORT json(bool_val &&orig);
     JSON_EXPORT json(string_val &&orig);
-    JSON_EXPORT json(int_val &&orig);
-    JSON_EXPORT json(float_val &&orig);
+    JSON_EXPORT json(number_val &&orig);
     JSON_EXPORT json(null_val &&orig);
 
     JSON_EXPORT void operator=(bool val);
     JSON_EXPORT void operator=(const std::string &str);
     JSON_EXPORT void operator=(const char *str);
+    JSON_EXPORT void operator=(short int val);
+    JSON_EXPORT void operator=(unsigned short int val);
     JSON_EXPORT void operator=(long val);
+    JSON_EXPORT void operator=(long long val);
+    JSON_EXPORT void operator=(unsigned long long val);
     JSON_EXPORT void operator=(double val);
+    JSON_EXPORT void operator=(long double val);
     JSON_EXPORT void operator=(json val);
 
     virtual json &operator[](const std::string &str);
     virtual json &operator[](size_t index);
+
+    operator array &() const { return static_cast<array &>(*j); }
 
     JSON_EXPORT std::string dump() const noexcept;
 
@@ -50,6 +65,64 @@ namespace json
 
   private:
     std::unique_ptr<json> j;
+  };
+
+  class null_val : public json
+  {
+  public:
+    JSON_EXPORT null_val() {}
+
+  private:
+    JSON_EXPORT void dump(std::ostream &os) const noexcept override { os << "null"; }
+  };
+
+  class bool_val : public json
+  {
+    friend class json;
+
+  public:
+    JSON_EXPORT bool_val(const bool &val);
+
+    operator bool() const { return val; }
+
+  private:
+    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+
+  private:
+    bool val;
+  };
+
+  class string_val : public json
+  {
+    friend class json;
+
+  public:
+    JSON_EXPORT string_val(const std::string &val);
+
+    operator std::string() const { return val; }
+
+  private:
+    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+
+  private:
+    std::string val;
+  };
+
+  class number_val : public json
+  {
+    friend class json;
+
+  public:
+    JSON_EXPORT number_val(const std::string &val);
+
+    operator long() const { return std::stol(val); }
+    operator double() const { return std::stod(val); }
+
+  private:
+    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+
+  private:
+    std::string val;
   };
 
   class object : public json
@@ -94,79 +167,6 @@ namespace json
 
   private:
     std::vector<json> vals;
-  };
-
-  class bool_val : public json
-  {
-    friend class json;
-
-  public:
-    JSON_EXPORT bool_val(const bool &val);
-
-    operator bool() const { return val; }
-
-  private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
-
-  private:
-    bool val;
-  };
-
-  class string_val : public json
-  {
-    friend class json;
-
-  public:
-    JSON_EXPORT string_val(const std::string &val);
-
-    operator std::string() const { return val; }
-
-  private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
-
-  private:
-    std::string val;
-  };
-
-  class int_val : public json
-  {
-    friend class json;
-
-  public:
-    JSON_EXPORT int_val(const long &val);
-
-    operator long() const { return val; }
-
-  private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
-
-  private:
-    long val;
-  };
-
-  class float_val : public json
-  {
-    friend class json;
-
-  public:
-    JSON_EXPORT float_val(const double &val);
-
-    operator double() const { return val; }
-
-  private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
-
-  private:
-    double val;
-  };
-
-  class null_val : public json
-  {
-  public:
-    JSON_EXPORT null_val() {}
-
-  private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override { os << "null"; }
   };
 
   JSON_EXPORT json load(std::istream &is);
