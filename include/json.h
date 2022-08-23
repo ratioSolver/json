@@ -87,6 +87,8 @@ namespace json
       return vals[index];
     }
 
+    void push_back(json &&val) { vals.push_back(std::move(val)); }
+
   private:
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
 
