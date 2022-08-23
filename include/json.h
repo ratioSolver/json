@@ -30,6 +30,7 @@ namespace json
     JSON_EXPORT json(unsigned short int val);
     JSON_EXPORT json(long val);
     JSON_EXPORT json(long long val);
+    JSON_EXPORT json(unsigned long val);
     JSON_EXPORT json(unsigned long long val);
     JSON_EXPORT json(double val);
     JSON_EXPORT json(long double val);
@@ -48,6 +49,7 @@ namespace json
     JSON_EXPORT void operator=(unsigned short int val);
     JSON_EXPORT void operator=(long val);
     JSON_EXPORT void operator=(long long val);
+    JSON_EXPORT void operator=(unsigned long val);
     JSON_EXPORT void operator=(unsigned long long val);
     JSON_EXPORT void operator=(double val);
     JSON_EXPORT void operator=(long double val);

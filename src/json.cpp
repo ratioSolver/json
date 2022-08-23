@@ -13,6 +13,7 @@ namespace json
     JSON_EXPORT json::json(unsigned short int val) : j(new number_val(std::to_string(val))) {}
     JSON_EXPORT json::json(long val) : j(new number_val(std::to_string(val))) {}
     JSON_EXPORT json::json(long long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(unsigned long val) : j(new number_val(std::to_string(val))) {}
     JSON_EXPORT json::json(unsigned long long val) : j(new number_val(std::to_string(val))) {}
     JSON_EXPORT json::json(double val) : j(new number_val(std::to_string(val))) {}
     JSON_EXPORT json::json(long double val) : j(new number_val(std::to_string(val))) {}
@@ -30,6 +31,7 @@ namespace json
     JSON_EXPORT void json::operator=(unsigned short int val) { j.reset(new number_val(std::to_string(val))); }
     JSON_EXPORT void json::operator=(long val) { j.reset(new number_val(std::to_string(val))); }
     JSON_EXPORT void json::operator=(long long val) { j.reset(new number_val(std::to_string(val))); }
+    JSON_EXPORT void json::operator=(unsigned long val) { j.reset(new number_val(std::to_string(val))); }
     JSON_EXPORT void json::operator=(unsigned long long val) { j.reset(new number_val(std::to_string(val))); }
     JSON_EXPORT void json::operator=(double val) { j.reset(new number_val(std::to_string(val))); }
     JSON_EXPORT void json::operator=(long double val) { j.reset(new number_val(std::to_string(val))); }
