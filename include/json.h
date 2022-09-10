@@ -58,7 +58,7 @@ namespace json
     virtual json &operator[](const std::string &str);
     virtual json &operator[](size_t index);
 
-    operator array &() const { return static_cast<array &>(*j); }
+    JSON_EXPORT operator array &() const;
 
     JSON_EXPORT std::string dump() const noexcept;
 

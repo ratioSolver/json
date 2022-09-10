@@ -1,5 +1,6 @@
 #include "json.h"
 #include <sstream>
+#include <cassert>
 
 void test_json_0()
 {
@@ -28,8 +29,22 @@ void test_json_1()
     std::string js = j_obj.dump();
 }
 
+json::json get_json()
+{
+    json::array arr;
+    return arr;
+}
+
+void test_json_2()
+{
+    auto arr = get_json();
+    json::array &c_arr = arr;
+    assert(c_arr.size() == 0);
+}
+
 int main(int, char **)
 {
     test_json_0();
     test_json_1();
+    test_json_2();
 }
