@@ -37,10 +37,11 @@ namespace json
     JSON_EXPORT void json::operator=(long double val) { j.reset(new number_val(std::to_string(val))); }
     JSON_EXPORT void json::operator=(json val) { j.swap(val.j); }
 
-    JSON_EXPORT json::operator array &() const { return static_cast<array &>(*j); }
     JSON_EXPORT json::operator bool_val &() const { return static_cast<bool_val &>(*j); }
     JSON_EXPORT json::operator string_val &() const { return static_cast<string_val &>(*j); }
     JSON_EXPORT json::operator number_val &() const { return static_cast<number_val &>(*j); }
+    JSON_EXPORT json::operator object &() const { return static_cast<object &>(*j); }
+    JSON_EXPORT json::operator array &() const { return static_cast<array &>(*j); }
 
     JSON_EXPORT std::string json::dump() const noexcept
     {

@@ -58,10 +58,11 @@ namespace json
     virtual json &operator[](const std::string &str);
     virtual json &operator[](size_t index);
 
-    JSON_EXPORT operator array &() const;
     JSON_EXPORT operator bool_val &() const;
     JSON_EXPORT operator string_val &() const;
     JSON_EXPORT operator number_val &() const;
+    JSON_EXPORT operator array &() const;
+    JSON_EXPORT operator object &() const;
 
     JSON_EXPORT std::string dump() const noexcept;
 
@@ -140,6 +141,11 @@ namespace json
 
     json &operator[](const std::string &str) override { return vals[str]; }
 
+    auto cbegin() const { return vals.begin(); }
+    auto cend() const { return vals.end(); }
+    auto begin() const { return vals.begin(); }
+    auto end() const { return vals.end(); }
+
   private:
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
 
@@ -164,6 +170,11 @@ namespace json
         vals.resize(index + 1);
       return vals[index];
     }
+
+    auto cbegin() const { return vals.begin(); }
+    auto cend() const { return vals.end(); }
+    auto begin() const { return vals.begin(); }
+    auto end() const { return vals.end(); }
 
     void push_back(json &&val) { vals.push_back(std::move(val)); }
 
