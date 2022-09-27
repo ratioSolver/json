@@ -59,6 +59,9 @@ namespace json
     virtual json &operator[](size_t index);
 
     JSON_EXPORT operator array &() const;
+    JSON_EXPORT operator bool_val &() const;
+    JSON_EXPORT operator string_val &() const;
+    JSON_EXPORT operator number_val &() const;
 
     JSON_EXPORT std::string dump() const noexcept;
 
