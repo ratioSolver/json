@@ -121,6 +121,7 @@ namespace json
   public:
     JSON_EXPORT number_val(const std::string &val);
 
+    operator unsigned long() const { return std::stoul(val); }
     operator long() const { return std::stol(val); }
     operator double() const { return std::stod(val); }
 
