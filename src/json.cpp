@@ -114,8 +114,11 @@ namespace json
             get_char(is);
             std::map<std::string, json> vals;
             is >> std::ws;
-            if (is.peek() == '}') // we have an empty object..
+            if (is.peek() == '}')
+            { // we have an empty object..
+                get_char(is);
                 return object(std::move(vals));
+            }
             do
             {
                 is >> std::ws;
@@ -139,6 +142,11 @@ namespace json
         { // we have a json array..
             get_char(is);
             std::vector<json> vals;
+            if (is.peek() == ']')
+            { // we have an empty array..
+                get_char(is);
+                return array(std::move(vals));
+            }
             do
             {
                 vals.push_back(load(is));

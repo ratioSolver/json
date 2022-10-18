@@ -42,9 +42,17 @@ void test_json_2()
     assert(c_arr.size() == 0);
 }
 
+void test_json_3()
+{
+    std::stringstream s("{\"executing\": []}");
+    json::json j_obj = json::load(s);
+    std::string js = j_obj.dump();
+}
+
 int main(int, char **)
 {
     test_json_0();
     test_json_1();
     test_json_2();
+    test_json_3();
 }
