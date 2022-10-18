@@ -140,6 +140,7 @@ namespace json
     JSON_EXPORT object();
     JSON_EXPORT object(std::map<std::string, json> &&vals);
 
+    bool has(const std::string &str) const { return vals.count(str); }
     json &operator[](const std::string &str) override { return vals[str]; }
 
     auto cbegin() const { return vals.begin(); }
