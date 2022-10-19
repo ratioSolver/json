@@ -145,8 +145,8 @@ namespace json
 
     auto cbegin() const { return vals.begin(); }
     auto cend() const { return vals.end(); }
-    auto begin() const { return vals.begin(); }
-    auto end() const { return vals.end(); }
+    auto begin() { return vals.begin(); }
+    auto end() { return vals.end(); }
 
   private:
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
@@ -175,8 +175,8 @@ namespace json
 
     auto cbegin() const { return vals.begin(); }
     auto cend() const { return vals.end(); }
-    auto begin() const { return vals.begin(); }
-    auto end() const { return vals.end(); }
+    auto begin() { return vals.begin(); }
+    auto end() { return vals.end(); }
 
     void push_back(json &&val) { vals.push_back(std::move(val)); }
 
