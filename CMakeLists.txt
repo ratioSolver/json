@@ -15,6 +15,8 @@ include(CMakePackageConfigHelpers)
 include(CTest)
 enable_testing()
 
+option(ADD_COVERAGE "Add coverage" OFF)
+
 file(GLOB JSON_SOURCES src/*.cpp)
 file(GLOB JSON_HEADERS include/*.h)
 
@@ -30,6 +32,12 @@ if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+    if (ADD_COVERAGE)
+        if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            target_compile_options(${PROJECT_NAME} PRIVATE --coverage)
+            target_link_libraries(${PROJECT_NAME} PUBLIC gcov)
+        endif()
+    endif()
 endif()
 
 install(
