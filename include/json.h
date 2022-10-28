@@ -23,17 +23,6 @@ namespace json
 
   public:
     JSON_EXPORT json();
-    JSON_EXPORT json(bool val);
-    JSON_EXPORT json(const std::string &str);
-    JSON_EXPORT json(const char *str);
-    JSON_EXPORT json(short int val);
-    JSON_EXPORT json(unsigned short int val);
-    JSON_EXPORT json(long val);
-    JSON_EXPORT json(long long val);
-    JSON_EXPORT json(unsigned long val);
-    JSON_EXPORT json(unsigned long long val);
-    JSON_EXPORT json(double val);
-    JSON_EXPORT json(long double val);
     JSON_EXPORT json(json &&orig);
     JSON_EXPORT json(object &&orig);
     JSON_EXPORT json(array &&orig);
@@ -41,6 +30,7 @@ namespace json
     JSON_EXPORT json(string_val &&orig);
     JSON_EXPORT json(number_val &&orig);
     JSON_EXPORT json(null_val &&orig);
+    virtual ~json() {}
 
     JSON_EXPORT void operator=(bool val);
     JSON_EXPORT void operator=(const std::string &str);
