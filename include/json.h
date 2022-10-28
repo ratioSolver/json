@@ -30,7 +30,7 @@ namespace json
     JSON_EXPORT json(string_val &&orig);
     JSON_EXPORT json(number_val &&orig);
     JSON_EXPORT json(null_val &&orig);
-    virtual ~json() {}
+    virtual ~json() = default;
 
     JSON_EXPORT void operator=(bool val);
     JSON_EXPORT void operator=(const std::string &str);
