@@ -41,13 +41,13 @@ namespace json
         return ss.str();
     }
 
-    json &json::operator[](const std::string &str)
+    JSON_EXPORT json &json::operator[](const std::string &str)
     {
         if (!j)
             j = std::make_unique<object>();
         return (*j)[str];
     }
-    json &json::operator[](size_t index)
+    JSON_EXPORT json &json::operator[](size_t index)
     {
         if (!j)
             j = std::make_unique<array>();

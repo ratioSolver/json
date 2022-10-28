@@ -45,8 +45,8 @@ namespace json
     JSON_EXPORT void operator=(long double val);
     JSON_EXPORT void operator=(json val);
 
-    virtual json &operator[](const std::string &str);
-    virtual json &operator[](size_t index);
+    virtual JSON_EXPORT json &operator[](const std::string &str);
+    virtual JSON_EXPORT json &operator[](size_t index);
 
     JSON_EXPORT operator bool_val &() const;
     JSON_EXPORT operator string_val &() const;
