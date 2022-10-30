@@ -24,6 +24,7 @@ void test_json_0()
     arr[3] = 5ul;
     arr[4] = 5ull;
     arr[5] = 5.0l;
+    arr[6] = true;
 
     json::json o2;
     o2["a"] = 5l;

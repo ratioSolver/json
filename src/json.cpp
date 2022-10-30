@@ -5,7 +5,18 @@ namespace json
 {
     inline char get_char(std::istream &is) { return static_cast<char>(is.get()); }
 
-    JSON_EXPORT json::json() {}
+    JSON_EXPORT json::json() {}    
+    JSON_EXPORT json::json(bool val) : j(new bool_val(val)) {}
+    JSON_EXPORT json::json(const std::string &str) : j(new string_val(str)) {}
+    JSON_EXPORT json::json(const char *str) : j(new string_val(str)) {}
+    JSON_EXPORT json::json(short int val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(unsigned short int val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(long long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(unsigned long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(unsigned long long val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(double val) : j(new number_val(std::to_string(val))) {}
+    JSON_EXPORT json::json(long double val) : j(new number_val(std::to_string(val))) {}
     JSON_EXPORT json::json(json &&orig) : j(std::move(orig.j)) {}
     JSON_EXPORT json::json(object &&orig) { j.reset(new object(std::move(orig.vals))); }
     JSON_EXPORT json::json(array &&orig) { j.reset(new array(std::move(orig.vals))); }
