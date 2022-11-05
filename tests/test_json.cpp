@@ -43,8 +43,7 @@ void test_json_1()
     json::json j_obj_0;
     std::string js = j_obj_0.dump();
 
-    std::stringstream s("{\"a\": \"a\", \"b\": 1, \"c\": 1.500000, \"d\": true, \"e\": [true, false], \"f\": null, \"g\": {\"a\": true, \"b\": 1}}");
-    json::json j_obj = json::load(s);
+    json::json j_obj = json::load("{\"a\": \"a\", \"b\": 1, \"c\": 1.500000, \"d\": true, \"e\": [true, false], \"f\": null, \"g\": {\"a\": true, \"b\": 1}}");
     js = j_obj.dump();
 }
 
@@ -63,12 +62,10 @@ void test_json_2()
 
 void test_json_3()
 {
-    std::stringstream s0("{\"exec0\": [], \"exec1\": {}, \"t0\": 1E+10, \"t1\": 1.23E+10, \"t2\": .23E+10, \"t3\": .23}");
-    json::json j_obj0 = json::load(s0);
+    json::json j_obj0 = json::load("{\"exec0\": [], \"exec1\": {}, \"t0\": 1E+10, \"t1\": 1.23E+10, \"t2\": .23E+10, \"t3\": .23}");
     std::string js0 = j_obj0.dump();
 
-    std::stringstream s1("{\"t0\": 1E-10, \"t1\": 1.23E-10, \"t2\": .23E-10}");
-    json::json j_obj1 = json::load(s1);
+    json::json j_obj1 = json::load("{\"t0\": 1E-10, \"t1\": 1.23E-10, \"t2\": .23E-10}");
     std::string js1 = j_obj1.dump();
 }
 

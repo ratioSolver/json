@@ -188,5 +188,7 @@ namespace json
     std::vector<json> vals;
   };
 
+  JSON_EXPORT json load(const char *str);
+  JSON_EXPORT json load(const std::string &str);
   JSON_EXPORT json load(std::istream &is);
 } // namespace json

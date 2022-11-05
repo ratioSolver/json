@@ -5,7 +5,7 @@ namespace json
 {
     inline char get_char(std::istream &is) { return static_cast<char>(is.get()); }
 
-    JSON_EXPORT json::json() {}    
+    JSON_EXPORT json::json() {}
     JSON_EXPORT json::json(bool val) : j(new bool_val(val)) {}
     JSON_EXPORT json::json(const std::string &str) : j(new string_val(str)) {}
     JSON_EXPORT json::json(const char *str) : j(new string_val(str)) {}
@@ -102,6 +102,20 @@ namespace json
             (*v_it).j->dump(os);
         }
         os << ']';
+    }
+
+    JSON_EXPORT json load(const char *str)
+    {
+        std::stringstream ss;
+        ss << str;
+        return load(ss);
+    }
+
+    JSON_EXPORT json load(const std::string &str)
+    {
+        std::stringstream ss;
+        ss << str;
+        return load(ss);
     }
 
     JSON_EXPORT json load(std::istream &is)
