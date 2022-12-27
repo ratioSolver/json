@@ -22,24 +22,118 @@ namespace json
     friend class array;
 
   public:
+    /**
+     * @brief Construct a new json object.
+     *
+     */
     JSON_EXPORT json();
+    /**
+     * @brief Construct a new json object from a boolean value.
+     *
+     * @param val the value to construct the json object from.
+     */
     JSON_EXPORT json(bool val);
+    /**
+     * @brief Construct a new json object from a string.
+     *
+     * @param str the string to construct the json object from.
+     */
     JSON_EXPORT json(const std::string &str);
+    /**
+     * @brief Construct a new json object from a string.
+     *
+     * @param str the string to construct the json object from.
+     */
     JSON_EXPORT json(const char *str);
+    /**
+     * @brief Construct a new json object from a short int.
+     *
+     * @param val the short int to construct the json object from.
+     */
     JSON_EXPORT json(short int val);
+    /**
+     * @brief Construct a new json object from an unsigned short int.
+     *
+     * @param val the unsigned short int to construct the json object from.
+     */
     JSON_EXPORT json(unsigned short int val);
+    /**
+     * @brief Construct a new json object from a long.
+     *
+     * @param val the long to construct the json object from.
+     */
     JSON_EXPORT json(long val);
+    /**
+     * @brief Construct a new json object from a long long.
+     *
+     * @param val the long long to construct the json object from.
+     */
     JSON_EXPORT json(long long val);
+    /**
+     * @brief Construct a new json object from an unsigned long.
+     *
+     * @param val the unsigned long to construct the json object from.
+     */
     JSON_EXPORT json(unsigned long val);
+    /**
+     * @brief Construct a new json object from an unsigned long long.
+     *
+     * @param val the unsigned long long to construct the json object from.
+     */
     JSON_EXPORT json(unsigned long long val);
+    /**
+     * @brief Construct a new json object from a double.
+     *
+     * @param val the double to construct the json object from.
+     */
     JSON_EXPORT json(double val);
+    /**
+     * @brief Construct a new json object from a long double.
+     *
+     * @param val the long double to construct the json object from.
+     */
     JSON_EXPORT json(long double val);
+    /**
+     * @brief Construct a new json object from a json object.
+     *
+     * @param orig the json object to construct the json object from.
+     */
     JSON_EXPORT json(json &&orig);
+    /**
+     * @brief Construct a new json object from an object.
+     *
+     * @param orig the object to construct the json object from.
+     */
     JSON_EXPORT json(object &&orig);
+    /**
+     * @brief Construct a new json object from an array.
+     *
+     * @param orig the array to construct the json object from.
+     */
     JSON_EXPORT json(array &&orig);
+    /**
+     * @brief Construct a new json object from a bool_val.
+     *
+     * @param orig the bool_val to construct the json object from.
+     */
     JSON_EXPORT json(bool_val &&orig);
+    /**
+     * @brief Construct a new json object from a string_val.
+     *
+     * @param orig the string_val to construct the json object from.
+     */
     JSON_EXPORT json(string_val &&orig);
+    /**
+     * @brief Construct a new json object from a number_val.
+     *
+     * @param orig the number_val to construct the json object from.
+     */
     JSON_EXPORT json(number_val &&orig);
+    /**
+     * @brief Construct a new json object from a null_val.
+     *
+     * @param orig the null_val to construct the json object from.
+     */
     JSON_EXPORT json(null_val &&orig);
     virtual ~json() = default;
 
@@ -65,9 +159,19 @@ namespace json
     JSON_EXPORT operator array &() const;
     JSON_EXPORT operator object &() const;
 
+    /**
+     * @brief Dump the json object to a string.
+     *
+     * @return std::string the json object as a string.
+     */
     JSON_EXPORT std::string dump() const noexcept;
 
   private:
+    /**
+     * @brief Dump the json object to a stream.
+     *
+     * @param os the stream to dump to.
+     */
     virtual void dump(std::ostream &os) const noexcept { j->dump(os); }
 
   private:
@@ -77,10 +181,10 @@ namespace json
   class null_val : public json
   {
   public:
-    JSON_EXPORT null_val() {}
+    null_val() {}
 
   private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override { os << "null"; }
+    void dump(std::ostream &os) const noexcept override { os << "null"; }
   };
 
   class bool_val : public json
@@ -96,7 +200,7 @@ namespace json
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
 
   private:
-    bool val;
+    bool val; // the value of the bool object.
   };
 
   class string_val : public json
@@ -112,7 +216,7 @@ namespace json
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
 
   private:
-    std::string val;
+    std::string val; // the value of the string object.
   };
 
   class number_val : public json
@@ -130,7 +234,7 @@ namespace json
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
 
   private:
-    std::string val;
+    std::string val; // the value of the number object.
   };
 
   class object : public json
@@ -153,7 +257,7 @@ namespace json
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
 
   private:
-    std::map<std::string, json> vals;
+    std::map<std::string, json> vals; // the values of the object indexed by key.
   };
 
   class array : public json
@@ -185,7 +289,7 @@ namespace json
     JSON_EXPORT void dump(std::ostream &os) const noexcept override;
 
   private:
-    std::vector<json> vals;
+    std::vector<json> vals; // the values of the array.
   };
 
   JSON_EXPORT json load(const char *str);
