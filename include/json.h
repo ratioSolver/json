@@ -277,7 +277,6 @@ namespace json
         vals.resize(index + 1);
       return vals[index];
     }
-    const json &at(const size_t index) const { return vals.at(index); }
 
     auto cbegin() const { return vals.begin(); }
     auto cend() const { return vals.end(); }
