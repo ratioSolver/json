@@ -270,13 +270,14 @@ namespace json
 
     inline void reserve(size_t size) { vals.reserve(size); }
 
-    size_t size() { return vals.size(); }
+    size_t size() const { return vals.size(); }
     json &operator[](size_t index) override
     {
       if (vals.size() < index + 1)
         vals.resize(index + 1);
       return vals[index];
     }
+    const json &at(const size_t index) const { return vals.at(index); }
 
     auto cbegin() const { return vals.begin(); }
     auto cend() const { return vals.end(); }
