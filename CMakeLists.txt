@@ -15,7 +15,7 @@ include(CMakePackageConfigHelpers)
 include(CTest)
 enable_testing()
 
-option(ADD_COVERAGE "Add coverage" OFF)
+add_subdirectory(extern/utils)
 
 file(GLOB JSON_SOURCES src/*.cpp)
 file(GLOB JSON_HEADERS include/*.h)
@@ -23,6 +23,7 @@ file(GLOB JSON_HEADERS include/*.h)
 add_library(${PROJECT_NAME} SHARED ${JSON_SOURCES})
 GENERATE_EXPORT_HEADER(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+target_link_libraries(${PROJECT_NAME} PUBLIC utils)
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

@@ -1,14 +1,23 @@
 #pragma once
 
 #include "json_export.h"
+#include "memory.h"
 #include <map>
-#include <memory>
 #include <vector>
-#include <string>
-#include <iostream>
+#include <sstream>
 
 namespace json
 {
+  enum class json_type
+  {
+    null,
+    boolean,
+    string,
+    number,
+    object,
+    array
+  };
+
   class bool_val;
   class string_val;
   class number_val;
@@ -21,243 +30,236 @@ namespace json
     friend class object;
     friend class array;
 
+  protected:
+    json(json_type tp) : m_type(tp), m_root(nullptr) {}
+
   public:
-    /**
-     * @brief Construct a new json object.
-     *
-     */
     JSON_EXPORT json();
-    /**
-     * @brief Construct a new json object from a boolean value.
-     *
-     * @param val the value to construct the json object from.
-     */
     JSON_EXPORT json(bool val);
-    /**
-     * @brief Construct a new json object from a string.
-     *
-     * @param str the string to construct the json object from.
-     */
-    JSON_EXPORT json(const std::string &str);
-    /**
-     * @brief Construct a new json object from a string.
-     *
-     * @param str the string to construct the json object from.
-     */
-    JSON_EXPORT json(const char *str);
-    /**
-     * @brief Construct a new json object from a short int.
-     *
-     * @param val the short int to construct the json object from.
-     */
-    JSON_EXPORT json(short int val);
-    /**
-     * @brief Construct a new json object from an unsigned short int.
-     *
-     * @param val the unsigned short int to construct the json object from.
-     */
-    JSON_EXPORT json(unsigned short int val);
-    /**
-     * @brief Construct a new json object from a long.
-     *
-     * @param val the long to construct the json object from.
-     */
+    JSON_EXPORT json(const char *val);
+    JSON_EXPORT json(const std::string &val);
     JSON_EXPORT json(long val);
-    /**
-     * @brief Construct a new json object from a long long.
-     *
-     * @param val the long long to construct the json object from.
-     */
-    JSON_EXPORT json(long long val);
-    /**
-     * @brief Construct a new json object from an unsigned long.
-     *
-     * @param val the unsigned long to construct the json object from.
-     */
     JSON_EXPORT json(unsigned long val);
-    /**
-     * @brief Construct a new json object from an unsigned long long.
-     *
-     * @param val the unsigned long long to construct the json object from.
-     */
-    JSON_EXPORT json(unsigned long long val);
-    /**
-     * @brief Construct a new json object from a double.
-     *
-     * @param val the double to construct the json object from.
-     */
     JSON_EXPORT json(double val);
-    /**
-     * @brief Construct a new json object from a long double.
-     *
-     * @param val the long double to construct the json object from.
-     */
-    JSON_EXPORT json(long double val);
-    /**
-     * @brief Construct a new json object from a json object.
-     *
-     * @param orig the json object to construct the json object from.
-     */
-    JSON_EXPORT json(json &&orig);
-    /**
-     * @brief Construct a new json object from an object.
-     *
-     * @param orig the object to construct the json object from.
-     */
-    JSON_EXPORT json(object &&orig);
-    /**
-     * @brief Construct a new json object from an array.
-     *
-     * @param orig the array to construct the json object from.
-     */
-    JSON_EXPORT json(array &&orig);
-    /**
-     * @brief Construct a new json object from a bool_val.
-     *
-     * @param orig the bool_val to construct the json object from.
-     */
-    JSON_EXPORT json(bool_val &&orig);
-    /**
-     * @brief Construct a new json object from a string_val.
-     *
-     * @param orig the string_val to construct the json object from.
-     */
-    JSON_EXPORT json(string_val &&orig);
-    /**
-     * @brief Construct a new json object from a number_val.
-     *
-     * @param orig the number_val to construct the json object from.
-     */
-    JSON_EXPORT json(number_val &&orig);
-    /**
-     * @brief Construct a new json object from a null_val.
-     *
-     * @param orig the null_val to construct the json object from.
-     */
-    JSON_EXPORT json(null_val &&orig);
+    JSON_EXPORT json(std::nullptr_t);
+    JSON_EXPORT json(bool_val &&other);
+    JSON_EXPORT json(string_val &&other);
+    JSON_EXPORT json(number_val &&other);
+    JSON_EXPORT json(null_val &&other);
+    JSON_EXPORT json(object &&other);
+    JSON_EXPORT json(array &&other);
+    JSON_EXPORT json(json &&other);
+    JSON_EXPORT json(std::map<std::string, json> &&other);
+    JSON_EXPORT json(std::vector<json> &&other);
+
     virtual ~json() = default;
 
-    JSON_EXPORT void operator=(bool val);
-    JSON_EXPORT void operator=(const std::string &str);
-    JSON_EXPORT void operator=(const char *str);
-    JSON_EXPORT void operator=(short int val);
-    JSON_EXPORT void operator=(unsigned short int val);
-    JSON_EXPORT void operator=(long val);
-    JSON_EXPORT void operator=(long long val);
-    JSON_EXPORT void operator=(unsigned long val);
-    JSON_EXPORT void operator=(unsigned long long val);
-    JSON_EXPORT void operator=(double val);
-    JSON_EXPORT void operator=(long double val);
-    JSON_EXPORT void operator=(json val);
-
-    virtual JSON_EXPORT json &operator[](const std::string &str);
-    virtual JSON_EXPORT json &operator[](size_t index);
-
     JSON_EXPORT operator bool_val &() const;
-    JSON_EXPORT operator string_val &() const;
-    JSON_EXPORT operator number_val &() const;
-    JSON_EXPORT operator array &() const;
-    JSON_EXPORT operator object &() const;
+    JSON_EXPORT void operator=(bool val);
+    JSON_EXPORT operator bool() const;
+    JSON_EXPORT bool operator==(bool val) const;
 
-    /**
-     * @brief Dump the json object to a string.
-     *
-     * @return std::string the json object as a string.
-     */
+    JSON_EXPORT operator string_val &() const;
+    JSON_EXPORT void operator=(const char *val);
+    JSON_EXPORT operator const char *() const;
+    JSON_EXPORT operator std::string() const;
+    JSON_EXPORT bool operator==(const char *val) const;
+
+    JSON_EXPORT operator number_val &() const;
+    JSON_EXPORT void operator=(long val);
+    JSON_EXPORT operator long() const;
+    JSON_EXPORT bool operator==(long val) const;
+
+    JSON_EXPORT void operator=(unsigned long val);
+    JSON_EXPORT operator unsigned long() const;
+    JSON_EXPORT bool operator==(unsigned long val) const;
+
+    JSON_EXPORT void operator=(double val);
+    JSON_EXPORT operator double() const;
+    JSON_EXPORT bool operator==(double val) const;
+
+    JSON_EXPORT operator null_val &() const;
+    JSON_EXPORT void operator=(std::nullptr_t);
+    JSON_EXPORT operator std::nullptr_t() const;
+    JSON_EXPORT bool operator==(std::nullptr_t) const;
+
+    JSON_EXPORT operator object &() const;
+    JSON_EXPORT void operator=(object &&val);
+    JSON_EXPORT operator const object &() const;
+    JSON_EXPORT bool operator==(const object &val) const;
+
+    JSON_EXPORT operator array &() const;
+    JSON_EXPORT void operator=(array &&val);
+    JSON_EXPORT operator const array &() const;
+    JSON_EXPORT bool operator==(const array &val) const;
+
+    JSON_EXPORT bool operator==(const json &other) const;
+    bool operator!=(const json &other) const { return !(*this == other); }
+
+    json_type type() const { return m_type; }
+
+    json &operator[](const char *key);
+    const json &operator[](const char *key) const { return operator[](key); }
+
+    json &operator[](size_t index);
+    const json &operator[](size_t index) const { return operator[](index); }
+
     JSON_EXPORT std::string dump() const noexcept;
 
-  private:
-    /**
-     * @brief Dump the json object to a stream.
-     *
-     * @param os the stream to dump to.
-     */
-    virtual void dump(std::ostream &os) const noexcept { j->dump(os); }
+    friend std::ostream &operator<<(std::ostream &os, const json &val)
+    {
+      val.dump(os);
+      return os;
+    }
 
   private:
-    std::unique_ptr<json> j;
-  };
-
-  class null_val : public json
-  {
-  public:
-    null_val() {}
+    virtual void dump(std::ostream &os) const noexcept { m_root->dump(os); }
 
   private:
-    void dump(std::ostream &os) const noexcept override { os << "null"; }
+    json_type m_type;
+    utils::u_ptr<json> m_root;
   };
 
   class bool_val : public json
   {
     friend class json;
+    friend class array;
 
   public:
-    JSON_EXPORT bool_val(const bool &val);
+    bool_val(bool val) : json(json_type::boolean), m_val(val) {}
 
-    operator bool() const { return val; }
+    void set(bool val) { m_val = val; }
+
+    bool operator==(bool val) const { return m_val == val; }
+    bool operator==(const json &val) const
+    {
+      if (val.type() != json_type::boolean)
+        return false;
+
+      return m_val == static_cast<bool_val &>(val).m_val;
+    }
+    operator bool() const { return m_val; }
 
   private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+    void dump(std::ostream &os) const noexcept override { os << (m_val ? "true" : "false"); }
 
   private:
-    bool val; // the value of the bool object.
+    bool m_val;
   };
 
   class string_val : public json
   {
     friend class json;
+    friend class array;
 
   public:
-    JSON_EXPORT string_val(const std::string &val);
+    string_val(const std::string &val) : json(json_type::string), m_val(val) {}
 
-    operator std::string() const { return val; }
+    void set(const char *val) { m_val = val; }
+
+    bool operator==(const char *val) const { return std::string(m_val) == val; }
+    bool operator==(const json &val) const
+    {
+      if (val.type() != json_type::string)
+        return false;
+
+      return m_val == static_cast<string_val &>(val).m_val;
+    }
 
   private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+    void dump(std::ostream &os) const noexcept override { os << '"' << m_val << '"'; }
 
   private:
-    std::string val; // the value of the string object.
+    std::string m_val;
   };
 
   class number_val : public json
   {
     friend class json;
+    friend class array;
 
   public:
-    JSON_EXPORT number_val(const std::string &val);
+    number_val(const std::string &val) : json(json_type::number), m_val(val) {}
 
-    operator unsigned long() const { return std::stoul(val); }
-    operator long() const { return std::stol(val); }
-    operator double() const { return std::stod(val); }
+    void set(const std::string &val) { m_val = val; }
+
+    bool operator==(const json &val) const
+    {
+      if (val.type() != json_type::number)
+        return false;
+
+      return m_val == static_cast<number_val &>(val).m_val;
+    }
 
   private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+    void dump(std::ostream &os) const noexcept override { os << m_val; }
 
   private:
-    std::string val; // the value of the number object.
+    std::string m_val;
+  };
+
+  class null_val : public json
+  {
+  public:
+    null_val() : json(json_type::null) {}
+
+  private:
+    void dump(std::ostream &os) const noexcept override { os << "null"; }
   };
 
   class object : public json
   {
     friend class json;
+    friend class array;
 
   public:
-    JSON_EXPORT object();
-    JSON_EXPORT object(std::map<std::string, json> &&vals);
+    object() : json(json_type::object) {}
+    object(std::map<std::string, json> &&map) : json(json_type::object), m_map(std::move(map)) {}
 
-    bool has(const std::string &str) const { return vals.count(str); }
-    json &operator[](const std::string &str) override { return vals[str]; }
+    bool has(const char *key) const { return m_map.find(key) != m_map.end(); }
 
-    auto cbegin() const { return vals.begin(); }
-    auto cend() const { return vals.end(); }
-    auto begin() { return vals.begin(); }
-    auto end() { return vals.end(); }
+    auto begin() { return m_map.begin(); }
+    auto end() { return m_map.end(); }
+    auto begin() const { return m_map.begin(); }
+    auto end() const { return m_map.end(); }
+
+    bool operator==(const object &other) const
+    {
+      if (m_map.size() != other.m_map.size())
+        return false;
+
+      for (auto &pair : m_map)
+      {
+        auto it = other.m_map.find(pair.first);
+        if (it == other.m_map.end())
+          return false;
+
+        if (pair.second != it->second)
+          return false;
+      }
+
+      return true;
+    }
+
+    json &operator[](const char *key) { return m_map[key]; }
 
   private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+    void dump(std::ostream &os) const noexcept override
+    {
+      os << '{';
+      for (auto it = m_map.begin(); it != m_map.end(); ++it)
+      {
+        if (it != m_map.begin())
+          os << ',';
+
+        os << '"' << it->first << "\":";
+        it->second.dump(os);
+      }
+      os << '}';
+    }
 
   private:
-    std::map<std::string, json> vals; // the values of the object indexed by key.
+    std::map<std::string, json> m_map;
   };
 
   class array : public json
@@ -265,34 +267,98 @@ namespace json
     friend class json;
 
   public:
-    JSON_EXPORT array();
-    JSON_EXPORT array(std::vector<json> &&vs);
+    array() : json(json_type::array) {}
+    array(std::vector<json> &&array) : json(json_type::array), m_array(std::move(array)) {}
 
-    inline void reserve(size_t size) { vals.reserve(size); }
-
-    size_t size() const { return vals.size(); }
-    json &operator[](size_t index) override
+    size_t size() const { return m_array.size(); }
+    void push_back(json &&val) { m_array.emplace_back(std::move(val)); }
+    void set(size_t index, json &&val)
     {
-      if (vals.size() < index + 1)
-        vals.resize(index + 1);
-      return vals[index];
+      switch (val.m_type)
+      {
+      case json_type::null:
+        break;
+      case json_type::boolean:
+        if (val.m_root)
+          m_array[index].m_root.reset(new bool_val(static_cast<bool_val &>(*val.m_root).m_val));
+        else
+          m_array[index].m_root.reset(new bool_val(static_cast<bool_val &>(val).m_val));
+        break;
+      case json_type::string:
+        if (val.m_root)
+          m_array[index].m_root.reset(new string_val(static_cast<string_val &>(*val.m_root).m_val));
+        else
+          m_array[index].m_root.reset(new string_val(static_cast<string_val &>(val).m_val));
+        break;
+      case json_type::number:
+        if (val.m_root)
+          m_array[index].m_root.reset(new number_val(static_cast<number_val &>(*val.m_root).m_val));
+        else
+          m_array[index].m_root.reset(new number_val(static_cast<number_val &>(val).m_val));
+        break;
+      case json_type::object:
+        if (val.m_root)
+          m_array[index].m_root.reset(new object(std::move(static_cast<object &>(*val.m_root).m_map)));
+        else
+          m_array[index].m_root.reset(new object(std::move(static_cast<object &>(val).m_map)));
+        break;
+      case json_type::array:
+        if (val.m_root)
+          m_array[index].m_root.reset(new array(std::move(static_cast<array &>(*val.m_root).m_array)));
+        else
+          m_array[index].m_root.reset(new array(std::move(static_cast<array &>(val).m_array)));
+        break;
+      }
     }
 
-    auto cbegin() const { return vals.begin(); }
-    auto cend() const { return vals.end(); }
-    auto begin() { return vals.begin(); }
-    auto end() { return vals.end(); }
+    auto begin() { return m_array.begin(); }
+    auto end() { return m_array.end(); }
+    auto begin() const { return m_array.begin(); }
+    auto end() const { return m_array.end(); }
 
-    void push_back(json &&val) { vals.push_back(std::move(val)); }
+    bool operator==(const array &other) const
+    {
+      if (m_array.size() != other.m_array.size())
+        return false;
+
+      for (size_t i = 0; i < m_array.size(); ++i)
+        if (m_array[i] != other.m_array[i])
+          return false;
+
+      return true;
+    }
+
+    json &operator[](size_t index) { return m_array[index]; }
 
   private:
-    JSON_EXPORT void dump(std::ostream &os) const noexcept override;
+    void dump(std::ostream &os) const noexcept override
+    {
+      os << '[';
+      for (auto it = m_array.begin(); it != m_array.end(); ++it)
+      {
+        if (it != m_array.begin())
+          os << ',';
+
+        it->dump(os);
+      }
+      os << ']';
+    }
 
   private:
-    std::vector<json> vals; // the values of the array.
+    std::vector<json> m_array;
   };
 
-  JSON_EXPORT json load(const char *str);
-  JSON_EXPORT json load(const std::string &str);
   JSON_EXPORT json load(std::istream &is);
+  JSON_EXPORT json load(const char *str)
+  {
+    std::stringstream ss;
+    ss << str;
+    return load(ss);
+  }
+  JSON_EXPORT json load(const std::string &str)
+  {
+    std::stringstream ss;
+    ss << str;
+    return load(ss);
+  }
 } // namespace json
