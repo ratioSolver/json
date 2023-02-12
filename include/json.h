@@ -431,13 +431,13 @@ namespace json
   };
 
   JSON_EXPORT json load(std::istream &is);
-  JSON_EXPORT json load(const char *str)
+  json load(const char *str)
   {
     std::stringstream ss;
     ss << str;
     return load(ss);
   }
-  JSON_EXPORT json load(const std::string &str)
+  json load(const std::string &str)
   {
     std::stringstream ss;
     ss << str;
