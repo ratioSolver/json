@@ -99,10 +99,10 @@ namespace json
     json_type type() const { return m_type; }
 
     json &operator[](const char *key);
-    const json &operator[](const char *key) const { return operator[](key); }
+    const json &operator[](const char *key) const;
 
     json &operator[](size_t index);
-    const json &operator[](size_t index) const { return operator[](index); }
+    const json &operator[](size_t index) const;
 
     JSON_EXPORT std::string dump() const noexcept;
 
@@ -136,7 +136,7 @@ namespace json
       if (val.type() != json_type::boolean)
         return false;
 
-      return m_val == static_cast<bool_val &>(val).m_val;
+      return m_val == static_cast<const bool_val &>(val).m_val;
     }
     operator bool() const { return m_val; }
 
@@ -163,7 +163,7 @@ namespace json
       if (val.type() != json_type::string)
         return false;
 
-      return m_val == static_cast<string_val &>(val).m_val;
+      return m_val == static_cast<const string_val &>(val).m_val;
     }
 
   private:
@@ -188,7 +188,7 @@ namespace json
       if (val.type() != json_type::number)
         return false;
 
-      return m_val == static_cast<number_val &>(val).m_val;
+      return m_val == static_cast<const number_val &>(val).m_val;
     }
 
   private:

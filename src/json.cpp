@@ -256,6 +256,11 @@ namespace json
         }
         return static_cast<object &>(*m_root)[key];
     }
+    JSON_EXPORT const json &json::operator[](const char *key) const
+    {
+        assert(m_type == json_type::object);
+        return static_cast<object &>(*m_root)[key];
+    }
 
     JSON_EXPORT json &json::operator[](size_t index)
     {
@@ -264,6 +269,11 @@ namespace json
             m_type = json_type::array;
             m_root.reset(new array());
         }
+        return static_cast<array &>(*m_root)[index];
+    }
+    JSON_EXPORT const json &json::operator[](size_t index) const
+    {
+        assert(m_type == json_type::array);
         return static_cast<array &>(*m_root)[index];
     }
 
