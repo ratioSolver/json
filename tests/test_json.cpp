@@ -5,147 +5,187 @@
 
 void test_json()
 {
-    json::json j = true;
-    assert(j == true);
-
-    j = "hello";
-    assert(j == "hello");
-
-    j = nullptr;
-    assert(j == nullptr);
-
-    j = 42l;
-    assert(j == 42l);
-
-    j = 42ul;
-    assert(j == 42ul);
-
-    j = 42.0;
-    assert(j == 42.0);
-
-    json::json j2 = std::move(j);
-    assert(j2 == 42.0);
-
-    json::object o;
-    o["hello"] = "world";
-    assert(o["hello"] == "world");
-
-    json::array a;
-    a.push_back(42l);
-    assert(a[0] == 42l);
-
-    json::array a2;
-    a2.push_back(43l);
-    LOG(a2);
-    a.push_back(std::move(a2));
-    LOG(a);
-
-    j["object"] = std::move(o);
-    assert(j["object"]["hello"] == "world");
-
-    j["array"] = std::move(a);
-
-    LOG(j);
-
-    auto j3 = json::load(j.dump());
-    LOG(j3);
-    assert(j3 == j);
+    std::stringstream ss;
+    ss << R"(
+{
+    "a": 1,
+    "b": 2.0,
+    "c": "3",
+    "d": true,
+    "e": null,
+    "f": [1, 2]
+}
+)";
+    json::json j = json::load(ss);
+    assert(j["a"] == 1);
+    assert(j["b"] == 2.0);
+    assert(j["c"] == "3");
+    assert(j["d"] == true);
+    assert(j["e"] == nullptr);
+    assert(j["f"][0] == 1);
+    assert(j["f"][1] == 2);
 }
 
-void test_json_0()
+void test_json_comparison()
 {
-    json::json o1;
-    o1["a"] = 5l;
-    o1["b"] = "test";
-    o1["c"] = 1.5;
-    o1["d"] = true;
+    json::json j0 = nullptr;
+    json::json j1 = nullptr;
+    assert(j0 == j1);
 
-    [[maybe_unused]] long a = o1["a"];
-    LOG(a);
-    std::string b = o1["b"];
-    LOG(b);
-    [[maybe_unused]] bool d = o1["d"];
-    LOG(d);
+    j0["a"] = 1;
+    j0["b"] = 2.0;
+    j0["c"] = "3";
+    j0["d"] = true;
+    j0["e"] = nullptr;
 
-    json::array arr;
-    arr.push_back(5l);
-    arr.push_back("test");
-    arr.push_back(1.5);
-    arr.push_back(5ul);
-    arr.push_back(true);
-    LOG(arr);
+    j1["a"] = 1;
+    j1["b"] = 2.0;
+    j1["c"] = "3";
+    j1["d"] = true;
+    j1["e"] = nullptr;
 
-    json::json o2;
-    o2["a"] = 5l;
-    o2["b"] = "test";
-    arr.set(2, std::move(o2));
-    LOG(arr);
+    assert(j0 == j1);
 
-    o1["c"] = std::move(arr);
+    j0["f"].push_back(1);
+    j0["f"].push_back(2);
 
-    [[maybe_unused]] json::array &c_o2 = o1["c"];
-    LOG(c_o2);
+    j1["f"].push_back(1);
+    j1["f"].push_back(2);
 
-    std::string js = o1.dump();
-    LOG(js);
+    assert(j0 == j1);
+
+    j0["f"].push_back(3);
+    assert(j0 != j1);
 }
 
-void test_json_1()
+void test_move_semantics()
 {
-    json::json j_obj_0;
-    std::string js = j_obj_0.dump();
-    LOG(js);
+    json::json j0 = nullptr;
+    j0["a"] = 1;
+    j0["b"] = 2.0;
+    j0["c"] = "3";
+    j0["d"] = true;
+    j0["e"] = nullptr;
+    j0["f"].push_back(1);
+    j0["f"].push_back(2);
+    j0["f"].push_back(3);
 
-    json::json j_obj = json::load("{\"a\": \"a\", \"b\": 1, \"c\": 1.500000, \"d\": true, \"e\": [true, false], \"f\": null, \"g\": {\"a\": true, \"b\": 1}}");
-    js = j_obj.dump();
-    LOG(js);
+    json::json j1 = std::move(j0);
+    assert(j0 == nullptr);
+    assert(j1 != nullptr);
+    assert(j1["a"] == 1);
+    assert(j1["b"] == 2.0);
+    assert(j1["c"] == "3");
+    assert(j1["d"] == true);
+    assert(j1["e"] == nullptr);
+    assert(j1["f"][0] == 1);
+    assert(j1["f"][1] == 2);
+    assert(j1["f"][2] == 3);
 }
 
-json::json get_json()
+void test_move_into_array()
 {
-    json::array arr;
-    return arr;
+    json::json j0;
+    j0.push_back(1);
+    j0.push_back(2);
+    j0.push_back(3);
+
+    json::json j1;
+    j1.push_back(std::move(j0));
+
+    assert(j0 == nullptr);
+    assert(j1 != nullptr);
+    assert(j1[0][0] == 1);
+    assert(j1[0][1] == 2);
+    assert(j1[0][2] == 3);
 }
 
-void test_json_2()
+void test_iterate()
 {
-    auto arr = get_json();
-    json::array &c_arr = arr;
-    assert(c_arr.size() == 0);
+    json::json j0 = nullptr;
+    j0["a"] = 1;
+    j0["b"] = 2.0;
+    j0["c"] = "3";
+    j0["d"] = true;
+    j0["e"] = nullptr;
+    j0["f"].push_back(1);
+    j0["f"].push_back(2);
+    j0["f"].push_back(3);
+
+    std::map<std::string, json::json> &m = j0.get_object();
+    for (auto &[key, value] : m)
+        LOG("key " << key << " value " << value);
+
+    json::json j1 = nullptr;
+    j1.push_back(1);
+    j1.push_back(2);
+    j1.push_back(3);
+
+    for (auto &value : j1.get_array())
+        LOG("value " << value);
 }
 
-void test_json_3()
+void test_null()
 {
-    json::json j_obj0 = json::load("{\"exec0\": [], \"exec1\": {}, \"t0\": 1E+10, \"t1\": 1.23E+10, \"t2\": .23E+10, \"t3\": .23}");
-    std::string js0 = j_obj0.dump();
-    LOG(js0);
-    [[maybe_unused]] double t0 = j_obj0["t0"];
-    LOG(t0);
-    [[maybe_unused]] double t1 = j_obj0["t1"];
-    LOG(t1);
-    [[maybe_unused]] double t2 = j_obj0["t2"];
-    LOG(t2);
-    [[maybe_unused]] double t3 = j_obj0["t3"];
-    LOG(t3);
+    json::json j0 = nullptr;
+    assert(j0 == nullptr);
+    assert(j0.get_type() == json::json_type::null);
+    assert(j0.to_string() == "null");
+}
 
-    json::json j_obj1 = json::load("{\"t0\": 1E-10, \"t1\": 1.23E-10, \"t2\": .23E-10}");
-    std::string js1 = j_obj1.dump();
-    LOG(js1);
-    [[maybe_unused]] double t4 = j_obj1["t0"];
-    LOG(t4);
-    [[maybe_unused]] double t5 = j_obj1["t1"];
-    LOG(t5);
-    [[maybe_unused]] double t6 = j_obj1["t2"];
-    LOG(t6);
+void test_empty_array()
+{
+    json::json j0 = json::json_type::array;
+    assert(j0.get_type() == json::json_type::array);
+    assert(j0.to_string() == "[]");
+}
+
+void test_empty_object()
+{
+    json::json j0 = json::json_type::object;
+    assert(j0.get_type() == json::json_type::object);
+    assert(j0.to_string() == "{}");
+}
+
+void test_scientific_numbers()
+{
+    json::json j0 = 1e+10;
+    assert(j0.get_type() == json::json_type::number);
+    assert(j0.to_string() == std::to_string(1e+10));
+
+    json::json j1 = 1.23e+10;
+    assert(j1.get_type() == json::json_type::number);
+    assert(j1.to_string() == std::to_string(1.23e+10));
+
+    json::json j2 = .23e+10;
+    assert(j2.get_type() == json::json_type::number);
+    assert(j2.to_string() == std::to_string(.23e+10));
+}
+
+void test_array_of_scientific_numbers()
+{
+    json::json j0 = json::json_type::array;
+    j0.push_back(1e+10);
+    j0.push_back(1.23e+10);
+    j0.push_back(.23e+10);
+    assert(j0.get_type() == json::json_type::array);
+    assert(j0.to_string() == "[" + std::to_string(1e+10) + "," + std::to_string(1.23e+10) + "," + std::to_string(.23e+10) + "]");
 }
 
 int main(int, char **)
 {
     test_json();
-    test_json_0();
-    test_json_1();
-    test_json_2();
-    test_json_3();
+    test_json_comparison();
+    test_iterate();
+    test_move_semantics();
+    test_move_into_array();
+
+    test_null();
+    test_empty_array();
+    test_empty_object();
+
+    test_scientific_numbers();
+    test_array_of_scientific_numbers();
 
     return 0;
 }
