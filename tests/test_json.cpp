@@ -26,6 +26,28 @@ void test_json()
     assert(j["f"][1] == 2);
 }
 
+void test_initializer_lists()
+{
+    json::json j = {
+        {"a", 1},
+        {"b", 2.0},
+        {"c", "3"},
+        {"d", true},
+        {"e", nullptr},
+        {"f", {1, 2}},
+        {"g", {{"h", 1}, {"i", 2}}}};
+    LOG(j);
+    assert(j["a"] == 1);
+    assert(j["b"] == 2.0);
+    assert(j["c"] == "3");
+    assert(j["d"] == true);
+    assert(j["e"] == nullptr);
+    assert(j["f"][0] == 1);
+    assert(j["f"][1] == 2);
+    assert(j["g"]["h"] == 1);
+    assert(j["g"]["i"] == 2);
+}
+
 void test_json_comparison()
 {
     json::json j0 = nullptr;
@@ -113,7 +135,7 @@ void test_iterate()
     j0["f"].push_back(3);
 
     std::map<std::string, json::json> &m = j0.get_object();
-    for (auto &[key, value] : m)
+    for ([[maybe_unused]] auto &[key, value] : m)
         LOG("key " << key << " value " << value);
 
     json::json j1 = nullptr;
@@ -121,7 +143,7 @@ void test_iterate()
     j1.push_back(2);
     j1.push_back(3);
 
-    for (auto &value : j1.get_array())
+    for ([[maybe_unused]] auto &value : j1.get_array())
         LOG("value " << value);
 }
 
@@ -175,6 +197,8 @@ void test_array_of_scientific_numbers()
 int main(int, char **)
 {
     test_json();
+    test_initializer_lists();
+
     test_json_comparison();
     test_iterate();
     test_move_semantics();

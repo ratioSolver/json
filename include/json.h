@@ -36,6 +36,24 @@ namespace json
     json(unsigned long l) : type(json_type::number), str_val(std::to_string(l)) {}
     json(std::map<std::string, json> &&obj) : type(json_type::object), obj_val(std::move(obj)) {}
     json(std::vector<json> &&arr) : type(json_type::array), arr_val(std::move(arr)) {}
+    json(std::initializer_list<json> list) : type(json_type::array)
+    {
+      if (list.size() == 2 && list.begin()->type == json_type::string)
+      {
+        type = json_type::object;
+        obj_val.emplace(list.begin()->str_val, *(list.begin() + 1));
+      }
+      else if (list.begin()->type == json_type::object)
+      {
+        type = json_type::object;
+        for (auto &p : list)
+          for (auto &q : p.obj_val)
+            obj_val.emplace(q.first, q.second);
+      }
+      else
+        for (auto &p : list)
+          arr_val.emplace_back(p);
+    }
     json(const json &other) : type(other.type), bool_val(other.bool_val), str_val(other.str_val), obj_val(other.obj_val), arr_val(other.arr_val) {}
     json(json &&other) : type(other.type), bool_val(other.bool_val), str_val(std::move(other.str_val)), obj_val(std::move(other.obj_val)), arr_val(std::move(other.arr_val)) { other.type = json_type::null; }
 
@@ -359,13 +377,13 @@ namespace json
     std::string to_string() const
     {
       std::stringstream ss;
-      to_string(ss);
+      dump(ss);
       return ss.str();
     }
 
     friend std::ostream &operator<<(std::ostream &os, const json &j)
     {
-      j.to_string(os);
+      j.dump(os);
       return os;
     }
 
@@ -382,7 +400,7 @@ namespace json
       }
     }
 
-    void to_string(std::ostream &os) const
+    void dump(std::ostream &os) const
     {
       switch (type)
       {
@@ -402,7 +420,7 @@ namespace json
         os << "[";
         for (size_t i = 0; i < arr_val.size(); i++)
         {
-          arr_val[i].to_string(os);
+          arr_val[i].dump(os);
           if (i != arr_val.size() - 1)
             os << ",";
         }
@@ -413,7 +431,7 @@ namespace json
         for (auto it = obj_val.begin(); it != obj_val.end(); it++)
         {
           os << "\"" << it->first << "\":";
-          it->second.to_string(os);
+          it->second.dump(os);
           if (it != --obj_val.end())
             os << ",";
         }
