@@ -105,6 +105,18 @@ namespace json
       str_val = std::to_string(d);
       return *this;
     }
+    json &operator=(long l)
+    {
+      set_type(json_type::number);
+      str_val = std::to_string(l);
+      return *this;
+    }
+    json &operator=(unsigned long l)
+    {
+      set_type(json_type::number);
+      str_val = std::to_string(l);
+      return *this;
+    }
     json &operator=(std::nullptr_t)
     {
       set_type(json_type::null);
@@ -449,13 +461,13 @@ namespace json
   };
 
   JSON_EXPORT json load(std::istream &is);
-  json load(const char *str)
+  inline json load(const char *str)
   {
     std::stringstream ss;
     ss << str;
     return load(ss);
   }
-  json load(const std::string &str)
+  inline json load(const std::string &str)
   {
     std::stringstream ss;
     ss << str;
