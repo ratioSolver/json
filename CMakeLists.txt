@@ -15,7 +15,10 @@ include(CMakePackageConfigHelpers)
 include(CTest)
 enable_testing()
 
-add_subdirectory(extern/utils)
+option(JSON_INCLUDE_UTILS "Include utils library" ON)
+if(JSON_INCLUDE_UTILS)
+    add_subdirectory(extern/utils)
+endif()
 
 file(GLOB JSON_SOURCES src/*.cpp)
 file(GLOB JSON_HEADERS include/*.h)
