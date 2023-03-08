@@ -115,7 +115,8 @@ namespace json
       set_type(json_type::object);
       return obj_val[key];
     }
-    json &operator[](int index)
+    json &operator[](int index) { return operator[](static_cast<size_t>(index)); }
+    json &operator[](size_t index)
     {
       set_type(json_type::array);
       return arr_val[index];
