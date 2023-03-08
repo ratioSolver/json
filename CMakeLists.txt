@@ -24,6 +24,7 @@ file(GLOB JSON_SOURCES src/*.cpp)
 file(GLOB JSON_HEADERS include/*.h)
 
 add_library(${PROJECT_NAME} SHARED ${JSON_SOURCES})
+add_dependencies(${PROJECT_NAME} utils)
 GENERATE_EXPORT_HEADER(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 target_link_libraries(${PROJECT_NAME} PUBLIC utils)
