@@ -382,15 +382,15 @@ namespace json
     }
 
   private:
-    void set_type(json_type type)
+    void set_type(json_type tp)
     {
-      if (type != this->type)
+      if (tp != type)
       {
         bool_val = false;
-        str_val = type == json_type::string ? "" : "0";
+        str_val = tp == json_type::string ? "" : "0";
         obj_val.clear();
         arr_val.clear();
-        this->type = type;
+        type = tp;
       }
     }
 
