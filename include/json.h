@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <type_traits>
 
 namespace json
 {
@@ -30,10 +31,8 @@ namespace json
     json(const std::string &str, bool is_number = false) : type(is_number ? json_type::number : json_type::string), str_val(str) {}
     json(const char *str, bool is_number = false) : type(is_number ? json_type::number : json_type::string), str_val(str) {}
     json(bool b) : type(json_type::boolean), bool_val(b) {}
-    json(int i) : type(json_type::number), str_val(std::to_string(i)) {}
-    json(double d) : type(json_type::number), str_val(std::to_string(d)) {}
-    json(long l) : type(json_type::number), str_val(std::to_string(l)) {}
-    json(unsigned long l) : type(json_type::number), str_val(std::to_string(l)) {}
+    template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+    json(T t) : type(json_type::number), str_val(std::to_string(t)) {}
     json(std::map<std::string, json> &&obj) : type(json_type::object), obj_val(std::move(obj)) {}
     json(std::vector<json> &&arr) : type(json_type::array), arr_val(std::move(arr)) {}
     json(std::initializer_list<json> list) : type(json_type::array)
@@ -93,28 +92,11 @@ namespace json
       bool_val = b;
       return *this;
     }
-    json &operator=(int i)
+    template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+    json &operator=(T t)
     {
       set_type(json_type::number);
-      str_val = std::to_string(i);
-      return *this;
-    }
-    json &operator=(double d)
-    {
-      set_type(json_type::number);
-      str_val = std::to_string(d);
-      return *this;
-    }
-    json &operator=(long l)
-    {
-      set_type(json_type::number);
-      str_val = std::to_string(l);
-      return *this;
-    }
-    json &operator=(unsigned long l)
-    {
-      set_type(json_type::number);
-      str_val = std::to_string(l);
+      str_val = std::to_string(t);
       return *this;
     }
     json &operator=(std::nullptr_t)
@@ -235,9 +217,9 @@ namespace json
       case json_type::boolean:
         return bool_val ? 1 : 0;
       case json_type::array:
-        return arr_val.size();
+        return static_cast<int>(arr_val.size());
       case json_type::object:
-        return obj_val.size();
+        return static_cast<int>(obj_val.size());
       default:
         return 0;
       }
@@ -255,9 +237,9 @@ namespace json
       case json_type::boolean:
         return bool_val ? 1 : 0;
       case json_type::array:
-        return arr_val.size();
+        return static_cast<double>(arr_val.size());
       case json_type::object:
-        return obj_val.size();
+        return static_cast<double>(obj_val.size());
       default:
         return 0;
       }
@@ -275,9 +257,9 @@ namespace json
       case json_type::boolean:
         return bool_val ? 1 : 0;
       case json_type::array:
-        return arr_val.size();
+        return static_cast<long>(arr_val.size());
       case json_type::object:
-        return obj_val.size();
+        return static_cast<long>(obj_val.size());
       default:
         return 0;
       }
@@ -295,9 +277,9 @@ namespace json
       case json_type::boolean:
         return bool_val ? 1 : 0;
       case json_type::array:
-        return arr_val.size();
+        return static_cast<unsigned long>(arr_val.size());
       case json_type::object:
-        return obj_val.size();
+        return static_cast<unsigned long>(obj_val.size());
       default:
         return 0;
       }
