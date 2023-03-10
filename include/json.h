@@ -351,11 +351,13 @@ namespace json
       set_type(json_type::object);
       return obj_val;
     }
+    const std::map<std::string, json> &get_object() const { return obj_val; }
     std::vector<json> &get_array()
     {
       set_type(json_type::array);
       return arr_val;
     }
+    const std::vector<json> &get_array() const { return arr_val; }
 
     void set(const std::string &key, json &&j)
     {
