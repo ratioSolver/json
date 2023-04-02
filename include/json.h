@@ -110,17 +110,25 @@ namespace json
       set_type(json_type::object);
       return obj_val[key];
     }
+    const json &operator[](const std::string &key) const { return obj_val.at(key); }
     json &operator[](const char *key)
     {
       set_type(json_type::object);
       return obj_val[key];
     }
-    json &operator[](int index) { return operator[](static_cast<size_t>(index)); }
+    const json &operator[](const char *key) const { return obj_val.at(key); }
+    json &operator[](int index)
+    {
+      set_type(json_type::array);
+      return arr_val[index];
+    }
+    const json &operator[](int index) const { return arr_val[index]; }
     json &operator[](size_t index)
     {
       set_type(json_type::array);
       return arr_val[index];
     }
+    const json &operator[](size_t index) const { return arr_val.at(index); }
 
     bool operator==(const json &other) const
     {
