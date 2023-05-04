@@ -105,6 +105,10 @@ namespace json
       return *this;
     }
 
+    bool has(const std::string &key) const { return type == json_type::object && obj_val.find(key) != obj_val.end(); }
+    bool has(const char *key) const { return type == json_type::object && obj_val.find(key) != obj_val.end(); }
+    bool has(size_t index) const { return type == json_type::array && index < arr_val.size(); }
+
     json &operator[](const std::string &key)
     {
       set_type(json_type::object);
