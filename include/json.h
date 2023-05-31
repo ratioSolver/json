@@ -451,7 +451,7 @@ namespace json
 
   private:
     json_type type;
-    bool bool_val;
+    bool bool_val = false;
     std::string str_val;
     std::map<std::string, json> obj_val;
     std::vector<json> arr_val;
