@@ -470,4 +470,5 @@ namespace json
     ss << str;
     return load(ss);
   }
+  JSON_EXPORT std::string parse_string(std::istream &is);
 } // namespace json

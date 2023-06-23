@@ -26,6 +26,51 @@ void test_json()
     assert(j["f"][1] == 2);
 }
 
+void test_json_escapes()
+{
+    std::stringstream ss;
+    ss << R"({
+  "id": "chatcmpl-7ToQ062g3kFeb8Tkds98KnqrAKyX7",
+  "object": "chat.completion",
+  "created": 1687339676,
+  "model": "gpt-3.5-turbo-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "function_call": {
+          "name": "create_solver",
+          "arguments": "{\n  \"purpose\": \"attività personalizzate\"\n}"
+        }
+      },
+      "finish_reason": "function_call"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 163,
+    "completion_tokens": 19,
+    "total_tokens": 182
+  }
+}
+)";
+    json::json j = json::load(ss);
+}
+
+void test_json_special_chars()
+{
+    std::stringstream ss;
+    ss << R"(
+{
+    "a": "\b\f\n\r\t\"\\"
+}
+)";
+    json::json j = json::load(ss);
+    LOG(j);
+    assert(j["a"] == "\b\f\n\r\t\"\\");
+}
+
 void test_initializer_lists()
 {
     json::json j = {
@@ -197,6 +242,8 @@ void test_array_of_scientific_numbers()
 int main(int, char **)
 {
     test_json();
+    test_json_escapes();
+    test_json_special_chars();
     test_initializer_lists();
 
     test_json_comparison();

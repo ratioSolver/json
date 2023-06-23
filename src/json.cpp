@@ -1,4 +1,5 @@
 #include "json.h"
+#include <iostream>
 
 inline char get_char(std::istream &is) { return static_cast<char>(is.get()); }
 
@@ -22,12 +23,9 @@ namespace json
             do
             {
                 is >> std::ws;
-                if (get_char(is) != '\"')
+                if (is.peek() != '\"')
                     throw std::invalid_argument("not a valid json");
-                std::string id;
-                while (is.peek() != '\"')
-                    id += get_char(is);
-                get_char(is);
+                std::string id = parse_string(is);
                 is >> std::ws;
                 if (get_char(is) != ':')
                     throw std::invalid_argument("not a valid json");
@@ -145,17 +143,89 @@ namespace json
                 return nullptr;
             throw std::invalid_argument("not a valid json");
         }
-        case '\"':
-        { // we have a json string..
+        case '\"': // we have a json string..
+            return parse_string(is);
+        case '/':
+        { // we have a json comment..
             get_char(is);
-            std::string id;
-            while (is.peek() != '\"')
-                id += get_char(is);
-            get_char(is);
-            return id;
+            if (is.peek() == '/')
+            {
+                while (is.peek() != '\n')
+                    get_char(is);
+                return load(is);
+            }
+            else if (is.peek() == '*')
+            {
+                while (is.peek() != '*')
+                    get_char(is);
+                get_char(is);
+                if (is.peek() == '/')
+                {
+                    get_char(is);
+                    return load(is);
+                }
+                else
+                    throw std::invalid_argument("not a valid json");
+            }
+            else
+                throw std::invalid_argument("not a valid json");
         }
         default:
             throw std::invalid_argument("not a valid json");
         }
+    }
+
+    JSON_EXPORT std::string parse_string(std::istream &is)
+    {
+        get_char(is);
+        std::string val;
+        while (is.peek() != '\"')
+            if (is.peek() == '\\')
+            {
+                get_char(is);
+                switch (get_char(is))
+                {
+                case '\"':
+                    val += '\"';
+                    break;
+                case '\\':
+                    val += '\\';
+                    break;
+                case '/':
+                    val += '/';
+                    break;
+                case 'b':
+                    val += '\b';
+                    break;
+                case 'f':
+                    val += '\f';
+                    break;
+                case 'n':
+                    val += '\n';
+                    break;
+                case 'r':
+                    val += '\r';
+                    break;
+                case 't':
+                    val += '\t';
+                    break;
+                case 'u':
+                {
+                    std::string hex;
+                    hex += get_char(is);
+                    hex += get_char(is);
+                    hex += get_char(is);
+                    hex += get_char(is);
+                    val += static_cast<char>(std::stoi(hex, nullptr, 16));
+                    break;
+                }
+                default:
+                    throw std::invalid_argument("not a valid json");
+                }
+            }
+            else
+                val += get_char(is);
+        get_char(is);
+        return val;
     }
 } // namespace json
