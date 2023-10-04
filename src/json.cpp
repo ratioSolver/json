@@ -211,12 +211,45 @@ namespace json
                     break;
                 case 'u':
                 {
-                    std::string hex;
-                    hex += get_char(is);
-                    hex += get_char(is);
-                    hex += get_char(is);
-                    hex += get_char(is);
-                    val += static_cast<char>(std::stoi(hex, nullptr, 16));
+                    int codepoint = 0;
+                    const auto factors = {12u, 8u, 4u, 0u};
+                    char c;
+                    for (const auto factor : factors)
+                    {
+                        c = get_char(is);
+                        if (c >= '0' && c <= '9')
+                            codepoint += static_cast<int>((static_cast<unsigned int>(c) - 0x30u) << factor);
+                        else if (c >= 'A' && c <= 'F')
+                            codepoint += static_cast<int>((static_cast<unsigned int>(c) - 0x37u) << factor);
+                        else if (c >= 'a' && c <= 'f')
+                            codepoint += static_cast<int>((static_cast<unsigned int>(c) - 0x57u) << factor);
+                        else
+                            throw std::invalid_argument("not a valid json");
+                    }
+
+                    // translate codepoint into bytes
+                    if (codepoint < 0x80)
+                    { // 1-byte characters: 0xxxxxxx (ASCII)
+                        val.push_back(static_cast<char>(codepoint));
+                    }
+                    else if (codepoint <= 0x7FF)
+                    { // 2-byte characters: 110xxxxx 10xxxxxx
+                        val.push_back(static_cast<char>(0xC0u | (static_cast<unsigned int>(codepoint) >> 6u)));
+                        val.push_back(static_cast<char>(0x80u | (static_cast<unsigned int>(codepoint) & 0x3Fu)));
+                    }
+                    else if (codepoint <= 0xFFFF)
+                    { // 3-byte characters: 1110xxxx 10xxxxxx 10xxxxxx
+                        val.push_back(static_cast<char>(0xE0u | (static_cast<unsigned int>(codepoint) >> 12u)));
+                        val.push_back(static_cast<char>(0x80u | ((static_cast<unsigned int>(codepoint) >> 6u) & 0x3Fu)));
+                        val.push_back(static_cast<char>(0x80u | (static_cast<unsigned int>(codepoint) & 0x3Fu)));
+                    }
+                    else
+                    { // 4-byte characters: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                        val.push_back(static_cast<char>(0xF0u | (static_cast<unsigned int>(codepoint) >> 18u)));
+                        val.push_back(static_cast<char>(0x80u | ((static_cast<unsigned int>(codepoint) >> 12u) & 0x3Fu)));
+                        val.push_back(static_cast<char>(0x80u | ((static_cast<unsigned int>(codepoint) >> 6u) & 0x3Fu)));
+                        val.push_back(static_cast<char>(0x80u | (static_cast<unsigned int>(codepoint) & 0x3Fu)));
+                    }
                     break;
                 }
                 default:
