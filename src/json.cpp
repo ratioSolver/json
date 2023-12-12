@@ -139,9 +139,19 @@ namespace json
         case 'n':
         { // we have a null literal..
             get_char(is);
-            if (get_char(is) == 'u' && get_char(is) == 'l' && get_char(is) == 'l')
-                return nullptr;
-            throw std::invalid_argument("not a valid json");
+            switch (get_char(is))
+            {
+            case 'a':
+                if (get_char(is) == 'n')
+                    return nullptr;
+                throw std::invalid_argument("not a valid json");
+            case 'u':
+                if (get_char(is) == 'l' && get_char(is) == 'l')
+                    return nullptr;
+                throw std::invalid_argument("not a valid json");
+            default:
+                throw std::invalid_argument("not a valid json");
+            }
         }
         case '\"': // we have a json string..
             return parse_string(is);
