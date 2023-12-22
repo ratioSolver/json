@@ -1,4 +1,4 @@
-#include "json.h"
+#include "json.hpp"
 #include <iostream>
 
 inline char get_char(std::istream &is) { return static_cast<char>(is.get()); }

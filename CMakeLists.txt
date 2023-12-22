@@ -22,7 +22,7 @@ if(JSON_INCLUDE_UTILS)
 endif()
 
 file(GLOB JSON_SOURCES src/*.cpp)
-file(GLOB JSON_HEADERS include/*.h)
+file(GLOB JSON_HEADERS include/*.hpp)
 
 add_library(${PROJECT_NAME} SHARED ${JSON_SOURCES})
 add_dependencies(${PROJECT_NAME} utils)

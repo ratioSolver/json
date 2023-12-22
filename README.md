@@ -5,7 +5,7 @@ This repository contains a [JSON](http://www.json.org/) parser and generator wri
 ## Read a JSON from a string
 
 ```c++
-#include "json.h"
+#include "json.hpp"
 #include <iostream>
 
 int main()
@@ -20,7 +20,7 @@ int main()
 ## Write a JSON to a string
 
 ```c++
-#include "json.h"
+#include "json.hpp"
 #include <iostream>
 
 int main()
