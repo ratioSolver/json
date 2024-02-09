@@ -1,5 +1,5 @@
 #include "json.hpp"
-#include "logging.h"
+#include "logging.hpp"
 #include <sstream>
 #include <cassert>
 
@@ -67,7 +67,7 @@ void test_json_special_chars()
 }
 )";
     json::json j = json::load(ss);
-    LOG(j);
+    LOG_INFO(j);
     assert(j["a"] == "\b\f\n\r\t\"\\");
 }
 
@@ -81,7 +81,7 @@ void test_initializer_lists()
         {"e", nullptr},
         {"f", {1, 2}},
         {"g", {{"h", 1}, {"i", 2}}}};
-    LOG(j);
+    LOG_INFO(j);
     assert(j["a"] == 1);
     assert(j["b"] == 2.0);
     assert(j["c"] == "3");
@@ -181,7 +181,7 @@ void test_iterate()
 
     std::map<std::string, json::json> &m = j0.get_object();
     for ([[maybe_unused]] auto &[key, value] : m)
-        LOG("key " << key << " value " << value);
+        LOG_INFO("key " << key << " value " << value);
 
     json::json j1 = nullptr;
     j1.push_back(1);
@@ -189,7 +189,7 @@ void test_iterate()
     j1.push_back(3);
 
     for ([[maybe_unused]] auto &value : j1.get_array())
-        LOG("value " << value);
+        LOG_INFO("value " << value);
 }
 
 void test_null()

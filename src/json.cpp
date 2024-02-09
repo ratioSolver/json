@@ -5,7 +5,7 @@ inline char get_char(std::istream &is) { return static_cast<char>(is.get()); }
 
 namespace json
 {
-    JSON_EXPORT json load(std::istream &is)
+    json load(std::istream &is)
     {
         is >> std::ws; // we remove all the leading whitespace..
         switch (is.peek())
@@ -185,7 +185,7 @@ namespace json
         }
     }
 
-    JSON_EXPORT std::string parse_string(std::istream &is)
+    std::string parse_string(std::istream &is)
     {
         get_char(is);
         std::string val;

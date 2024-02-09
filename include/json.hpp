@@ -1,6 +1,5 @@
 #pragma once
 
-#include "json_export.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -457,7 +456,7 @@ namespace json
     std::vector<json> arr_val;
   };
 
-  JSON_EXPORT json load(std::istream &is);
+  json load(std::istream &is);
   inline json load(const char *str)
   {
     std::stringstream ss;
@@ -470,5 +469,5 @@ namespace json
     ss << str;
     return load(ss);
   }
-  JSON_EXPORT std::string parse_string(std::istream &is);
+  std::string parse_string(std::istream &is);
 } // namespace json
