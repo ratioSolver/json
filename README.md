@@ -1,5 +1,7 @@
 # JSON
 
+![Build Status](https://github.com/ratioSolver/json/actions/workflows/cmake.yml/badge.svg)
+
 This repository contains a [JSON](http://www.json.org/) parser and generator written in C++.
 
 ## Read a JSON from a string
