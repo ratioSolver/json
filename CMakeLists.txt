@@ -5,7 +5,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined")
 include(CTest)
 enable_testing()
 
-add_subdirectory(extern/utils)
+option(JSON_INCLUDE_UTILS "Include utils library" ON)
+if(JSON_INCLUDE_UTILS)
+    add_subdirectory(extern/utils)
+endif()
 
 add_library(${PROJECT_NAME} src/json.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
