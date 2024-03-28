@@ -20,7 +20,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install dependencies
+      - name: Install dependencies (Ubuntu)
         if: matrix.build_type == 'Debug' && matrix.os == 'ubuntu-latest'
         run: sudo apt-get install -y lcov valgrind
 
@@ -29,8 +29,8 @@ jobs:
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON
 
       - name: Configure CMake
-        if: matrix.build_type == 'Release'
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
+        if: matrix.build_type != 'Debug'
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
