@@ -1,8 +1,6 @@
 #include "json.hpp"
 #include <iostream>
 
-inline char get_char(std::istream &is) { return static_cast<char>(is.get()); }
-
 namespace json
 {
     json load(std::istream &is)
@@ -12,12 +10,12 @@ namespace json
         {
         case '{':
         { // we have a json object..
-            get_char(is);
+            is.get();
             std::map<std::string, json> vals;
             is >> std::ws;
             if (is.peek() == '}')
             { // we have an empty object..
-                get_char(is);
+                is.get();
                 return vals;
             }
             do
@@ -27,31 +25,31 @@ namespace json
                     throw std::invalid_argument("not a valid json");
                 std::string id = parse_string(is);
                 is >> std::ws;
-                if (get_char(is) != ':')
+                if (is.get() != ':')
                     throw std::invalid_argument("not a valid json");
                 auto val = load(is);
                 vals.emplace(id, std::move(val));
                 is >> std::ws;
-            } while (is.peek() == ',' && get_char(is));
-            if (get_char(is) != '}')
+            } while (is.peek() == ',' && is.get());
+            if (is.get() != '}')
                 throw std::invalid_argument("not a valid json");
             return vals;
         }
         case '[':
         { // we have a json array..
-            get_char(is);
+            is.get();
             std::vector<json> vals;
             if (is.peek() == ']')
             { // we have an empty array..
-                get_char(is);
+                is.get();
                 return vals;
             }
             do
             {
                 vals.emplace_back(load(is));
                 is >> std::ws;
-            } while (is.peek() == ',' && get_char(is));
-            if (get_char(is) != ']')
+            } while (is.peek() == ',' && is.get());
+            if (is.get() != ']')
                 throw std::invalid_argument("not a valid json");
             return vals;
         }
@@ -68,36 +66,36 @@ namespace json
         case '9':
         {
             std::string num;
-            num += get_char(is);
+            num += is.get();
             while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                num += get_char(is);
+                num += is.get();
             if (is.peek() == '.')
             {
-                num += get_char(is);
+                num += is.get();
                 while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += get_char(is);
+                    num += is.get();
                 if (is.peek() == 'e' || is.peek() == 'E')
                 {
-                    num += get_char(is);
+                    num += is.get();
                     if (is.peek() == '+')
-                        num += get_char(is);
+                        num += is.get();
                     if (is.peek() == '-')
-                        num += get_char(is);
+                        num += is.get();
                     while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                        num += get_char(is);
+                        num += is.get();
                     return json(num, true);
                 }
                 return json(num, true);
             }
             else if (is.peek() == 'e' || is.peek() == 'E')
             {
-                num += get_char(is);
+                num += is.get();
                 if (is.peek() == '+')
-                    num += get_char(is);
+                    num += is.get();
                 if (is.peek() == '-')
-                    num += get_char(is);
+                    num += is.get();
                 while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += get_char(is);
+                    num += is.get();
                 return json(num, true);
             }
             else
@@ -106,47 +104,47 @@ namespace json
         case '.':
         {
             std::string num;
-            num += get_char(is);
+            num += is.get();
             while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                num += get_char(is);
+                num += is.get();
             if (is.peek() == 'e' || is.peek() == 'E')
             {
-                num += get_char(is);
+                num += is.get();
                 if (is.peek() == '+')
-                    num += get_char(is);
+                    num += is.get();
                 if (is.peek() == '-')
-                    num += get_char(is);
+                    num += is.get();
                 while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += get_char(is);
+                    num += is.get();
                 return json(num, true);
             }
             return json(num, true);
         }
         case 'f':
         { // we have a false literal..
-            get_char(is);
-            if (get_char(is) == 'a' && get_char(is) == 'l' && get_char(is) == 's' && get_char(is) == 'e')
+            is.get();
+            if (is.get() == 'a' && is.get() == 'l' && is.get() == 's' && is.get() == 'e')
                 return false;
             throw std::invalid_argument("not a valid json");
         }
         case 't':
         { // we have a true literal..
-            get_char(is);
-            if (get_char(is) == 'r' && get_char(is) == 'u' && get_char(is) == 'e')
+            is.get();
+            if (is.get() == 'r' && is.get() == 'u' && is.get() == 'e')
                 return true;
             throw std::invalid_argument("not a valid json");
         }
         case 'n':
         { // we have a null literal..
-            get_char(is);
-            switch (get_char(is))
+            is.get();
+            switch (is.get())
             {
             case 'a':
-                if (get_char(is) == 'n')
+                if (is.get() == 'n')
                     return nullptr;
                 throw std::invalid_argument("not a valid json");
             case 'u':
-                if (get_char(is) == 'l' && get_char(is) == 'l')
+                if (is.get() == 'l' && is.get() == 'l')
                     return nullptr;
                 throw std::invalid_argument("not a valid json");
             default:
@@ -157,21 +155,21 @@ namespace json
             return parse_string(is);
         case '/':
         { // we have a json comment..
-            get_char(is);
+            is.get();
             if (is.peek() == '/')
             {
                 while (is.peek() != '\n')
-                    get_char(is);
+                    is.get();
                 return load(is);
             }
             else if (is.peek() == '*')
             {
                 while (is.peek() != '*')
-                    get_char(is);
-                get_char(is);
+                    is.get();
+                is.get();
                 if (is.peek() == '/')
                 {
-                    get_char(is);
+                    is.get();
                     return load(is);
                 }
                 else
@@ -187,13 +185,13 @@ namespace json
 
     std::string parse_string(std::istream &is)
     {
-        get_char(is);
+        is.get();
         std::string val;
         while (is.peek() != '\"')
             if (is.peek() == '\\')
             {
-                get_char(is);
-                switch (get_char(is))
+                is.get();
+                switch (is.get())
                 {
                 case '\"':
                     val += '\"';
@@ -226,7 +224,7 @@ namespace json
                     char c;
                     for (const auto factor : factors)
                     {
-                        c = get_char(is);
+                        c = is.get();
                         if (c >= '0' && c <= '9')
                             codepoint += static_cast<int>((static_cast<unsigned int>(c) - 0x30u) << factor);
                         else if (c >= 'A' && c <= 'F')
@@ -267,8 +265,8 @@ namespace json
                 }
             }
             else
-                val += get_char(is);
-        get_char(is);
+                val += is.get();
+        is.get();
         return val;
     }
 } // namespace json
