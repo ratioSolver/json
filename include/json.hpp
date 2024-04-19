@@ -456,18 +456,42 @@ namespace json
     std::vector<json> arr_val;
   };
 
+  /**
+   * Loads a JSON object from the specified input stream.
+   *
+   * @param is The input stream to read the JSON object from.
+   * @return The loaded JSON object.
+   */
   json load(std::istream &is);
+  /**
+   * Loads a JSON object from a C-style string.
+   *
+   * @param str The C-style string containing the JSON data.
+   * @return A JSON object representing the parsed data.
+   */
   inline json load(const char *str)
   {
     std::stringstream ss;
     ss << str;
     return load(ss);
   }
+  /**
+   * Loads a JSON object from a string.
+   *
+   * @param str The string containing the JSON data.
+   * @return The loaded JSON object.
+   */
   inline json load(const std::string &str)
   {
     std::stringstream ss;
     ss << str;
     return load(ss);
   }
+  /**
+   * Parses a string from the given input stream.
+   *
+   * @param is The input stream to read the string from.
+   * @return The parsed string.
+   */
   std::string parse_string(std::istream &is);
 } // namespace json
