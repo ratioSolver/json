@@ -5,14 +5,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined")
 include(CTest)
 enable_testing()
 
-if(NOT TARGET utils)
-    add_subdirectory(extern/utils)
-endif()
-
 add_library(json src/json.cpp)
 add_dependencies(json utils)
 target_compile_features(json PUBLIC cxx_std_17)
 target_include_directories(json PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+if(NOT TARGET utils)
+    add_subdirectory(extern/utils)
+    add_dependencies(json utils)
+endif()
 target_link_libraries(json PUBLIC utils)
 
 if(BUILD_TESTING)
