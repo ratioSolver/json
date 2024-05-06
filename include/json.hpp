@@ -456,6 +456,12 @@ namespace json
     std::vector<json> arr_val;
   };
 
+  /**
+   * Converts a list of JSON objects to a JSON array.
+   *
+   * @param arr The list of JSON objects to convert.
+   * @return A JSON array containing the specified objects.
+   */
   json to_list(std::vector<json> &&arr);
 
   /**
