@@ -462,7 +462,7 @@ namespace json
    * @param arr The list of JSON objects to convert.
    * @return A JSON array containing the specified objects.
    */
-  json to_list(std::vector<json> &&arr);
+  json to_array(std::vector<json> &&arr);
 
   /**
    * Loads a JSON object from the specified input stream.

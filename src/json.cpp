@@ -3,11 +3,11 @@
 
 namespace json
 {
-    json to_list(const std::vector<json> &vals)
+    json to_array(std::vector<json> &&vals)
     {
         json j(json_type::array);
-        for (const auto &val : vals)
-            j.push_back(val);
+        for (auto &val : vals)
+            j.push_back(std::move(val));
         return j;
     }
 
