@@ -3,6 +3,14 @@
 
 namespace json
 {
+    json to_list(const std::vector<json> &vals)
+    {
+        json j(json_type::array);
+        for (const auto &val : vals)
+            j.push_back(val);
+        return j;
+    }
+
     json load(std::istream &is)
     {
         is >> std::ws; // we remove all the leading whitespace..

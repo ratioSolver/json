@@ -37,18 +37,18 @@ namespace json
     json(std::initializer_list<json> list) : type(json_type::array)
     {
       if (list.size() == 2 && list.begin()->type == json_type::string)
-      {
+      { // key-value pair
         type = json_type::object;
         obj_val.emplace(list.begin()->str_val, *(list.begin() + 1));
       }
       else if (list.begin()->type == json_type::object)
-      {
+      { // list of key-value pairs
         type = json_type::object;
         for (auto &p : list)
           for (auto &q : p.obj_val)
             obj_val.emplace(q.first, q.second);
       }
-      else
+      else // list of values
         for (auto &p : list)
           arr_val.emplace_back(p);
     }
@@ -455,6 +455,8 @@ namespace json
     std::map<std::string, json> obj_val;
     std::vector<json> arr_val;
   };
+
+  json to_list(std::vector<json> &&arr);
 
   /**
    * Loads a JSON object from the specified input stream.
