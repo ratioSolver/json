@@ -187,7 +187,7 @@ namespace json
                 return json(std::stod(num));
             }
             else
-                return json(std::stol(num));
+                return json(static_cast<int64_t>(std::stol(num)));
         }
         case '.':
         {

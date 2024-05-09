@@ -50,7 +50,7 @@ namespace json
         value = false;
         break;
       case json_type::number:
-        value = 0;
+        value = static_cast<int64_t>(0);
         break;
       case json_type::string:
         value = std::string();
