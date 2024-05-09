@@ -103,7 +103,7 @@ namespace json
      *
      * @param l The integer value to initialize the `json` object with.
      */
-    json(int l) noexcept : value(l) {}
+    json(int l) noexcept : value(static_cast<int64_t>(l)) {}
     /**
      * @brief Constructs a `json` object from an int64_t value.
      *
