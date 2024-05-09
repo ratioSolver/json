@@ -145,6 +145,15 @@ namespace json
      */
     json(const char *str) noexcept : value(std::string(str)) {}
     /**
+     * @brief Constructs a `json` object from a vector of `json` objects.
+     *
+     * This constructor initializes a `json` object with the given vector of `json` objects.
+     *
+     * @param arr The vector of `json` objects to initialize the `json` object with.
+     */
+    json(std::vector<json> &&arr) noexcept : value(std::move(arr)) {}
+
+    /**
      * @brief Constructs a `json` object from an initializer list.
      *
      * This constructor allows initializing a `json` object using an initializer list.
