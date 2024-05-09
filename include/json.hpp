@@ -659,7 +659,7 @@ namespace json
       case 2:
         return std::get<int64_t>(value) != 0;
       case 3:
-        return std::get<u_int64_t>(value) != 0;
+        return std::get<uint64_t>(value) != 0;
       case 4:
         return !std::get<double>(value);
       case 5:
