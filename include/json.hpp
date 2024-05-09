@@ -272,7 +272,7 @@ namespace json
      */
     json &operator=(int l) noexcept
     {
-      value = l;
+      value = static_cast<int64_t>(l);
       return *this;
     }
 
