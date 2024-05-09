@@ -95,8 +95,8 @@ void test_initializer_lists()
 
 void test_json_comparison()
 {
-    json::json j0 = nullptr;
-    json::json j1 = nullptr;
+    json::json j0;
+    json::json j1;
     assert(j0 == j1);
 
     j0["a"] = 1;
@@ -113,9 +113,11 @@ void test_json_comparison()
 
     assert(j0 == j1);
 
+    j0["f"] = json::json_type::array;
     j0["f"].push_back(1);
     j0["f"].push_back(2);
 
+    j1["f"] = json::json_type::array;
     j1["f"].push_back(1);
     j1["f"].push_back(2);
 
@@ -127,12 +129,13 @@ void test_json_comparison()
 
 void test_move_semantics()
 {
-    json::json j0 = nullptr;
+    json::json j0;
     j0["a"] = 1;
     j0["b"] = 2.0;
     j0["c"] = "3";
     j0["d"] = true;
     j0["e"] = nullptr;
+    j0["f"] = json::json_type::array;
     j0["f"].push_back(1);
     j0["f"].push_back(2);
     j0["f"].push_back(3);
@@ -152,12 +155,12 @@ void test_move_semantics()
 
 void test_move_into_array()
 {
-    json::json j0;
+    json::json j0 = json::json_type::array;
     j0.push_back(1);
     j0.push_back(2);
     j0.push_back(3);
 
-    json::json j1;
+    json::json j1 = json::json_type::array;
     j1.push_back(std::move(j0));
 
     assert(j0 == nullptr);
@@ -169,26 +172,27 @@ void test_move_into_array()
 
 void test_iterate()
 {
-    json::json j0 = nullptr;
+    json::json j0;
     j0["a"] = 1;
     j0["b"] = 2.0;
     j0["c"] = "3";
     j0["d"] = true;
     j0["e"] = nullptr;
+    j0["f"] = json::json_type::array;
     j0["f"].push_back(1);
     j0["f"].push_back(2);
     j0["f"].push_back(3);
 
-    std::map<std::string, json::json> &m = j0.get_object();
+    auto &m = j0.as_object();
     for ([[maybe_unused]] auto &[key, value] : m)
         LOG_INFO("key " << key << " value " << value);
 
-    json::json j1 = nullptr;
+    json::json j1 = json::json_type::array;
     j1.push_back(1);
     j1.push_back(2);
     j1.push_back(3);
 
-    for ([[maybe_unused]] auto &value : j1.get_array())
+    for ([[maybe_unused]] auto &value : j1.as_array())
         LOG_INFO("value " << value);
 }
 
@@ -197,36 +201,36 @@ void test_null()
     json::json j0 = nullptr;
     assert(j0 == nullptr);
     assert(j0.get_type() == json::json_type::null);
-    assert(j0.to_string() == "null");
+    assert(j0.dump() == "null");
 }
 
 void test_empty_array()
 {
     json::json j0 = json::json_type::array;
     assert(j0.get_type() == json::json_type::array);
-    assert(j0.to_string() == "[]");
+    assert(j0.dump() == "[]");
 }
 
 void test_empty_object()
 {
     json::json j0 = json::json_type::object;
     assert(j0.get_type() == json::json_type::object);
-    assert(j0.to_string() == "{}");
+    assert(j0.dump() == "{}");
 }
 
 void test_scientific_numbers()
 {
     json::json j0 = 1e+10;
     assert(j0.get_type() == json::json_type::number);
-    assert(j0.to_string() == std::to_string(1e+10));
+    assert(j0.dump() == std::to_string(1e+10));
 
     json::json j1 = 1.23e+10;
     assert(j1.get_type() == json::json_type::number);
-    assert(j1.to_string() == std::to_string(1.23e+10));
+    assert(j1.dump() == std::to_string(1.23e+10));
 
     json::json j2 = .23e+10;
     assert(j2.get_type() == json::json_type::number);
-    assert(j2.to_string() == std::to_string(.23e+10));
+    assert(j2.dump() == std::to_string(.23e+10));
 }
 
 void test_array_of_scientific_numbers()
@@ -236,7 +240,7 @@ void test_array_of_scientific_numbers()
     j0.push_back(1.23e+10);
     j0.push_back(.23e+10);
     assert(j0.get_type() == json::json_type::array);
-    assert(j0.to_string() == "[" + std::to_string(1e+10) + "," + std::to_string(1.23e+10) + "," + std::to_string(.23e+10) + "]");
+    assert(j0.dump() == "[" + std::to_string(1e+10) + "," + std::to_string(1.23e+10) + "," + std::to_string(.23e+10) + "]");
 }
 
 int main(int, char **)

@@ -1,196 +1,9 @@
 #include "json.hpp"
 #include <iostream>
+#include <sstream>
 
 namespace json
 {
-    json to_array(std::vector<json> &&vals)
-    {
-        json j(json_type::array);
-        for (auto &val : vals)
-            j.push_back(std::move(val));
-        return j;
-    }
-
-    json load(std::istream &is)
-    {
-        is >> std::ws; // we remove all the leading whitespace..
-        switch (is.peek())
-        {
-        case '{':
-        { // we have a json object..
-            is.get();
-            std::map<std::string, json> vals;
-            is >> std::ws;
-            if (is.peek() == '}')
-            { // we have an empty object..
-                is.get();
-                return vals;
-            }
-            do
-            {
-                is >> std::ws;
-                if (is.peek() != '\"')
-                    throw std::invalid_argument("not a valid json");
-                std::string id = parse_string(is);
-                is >> std::ws;
-                if (is.get() != ':')
-                    throw std::invalid_argument("not a valid json");
-                auto val = load(is);
-                vals.emplace(id, std::move(val));
-                is >> std::ws;
-            } while (is.peek() == ',' && is.get());
-            if (is.get() != '}')
-                throw std::invalid_argument("not a valid json");
-            return vals;
-        }
-        case '[':
-        { // we have a json array..
-            is.get();
-            std::vector<json> vals;
-            if (is.peek() == ']')
-            { // we have an empty array..
-                is.get();
-                return vals;
-            }
-            do
-            {
-                vals.emplace_back(load(is));
-                is >> std::ws;
-            } while (is.peek() == ',' && is.get());
-            if (is.get() != ']')
-                throw std::invalid_argument("not a valid json");
-            return vals;
-        }
-        case '-': // we have a json number..
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        {
-            std::string num;
-            num += is.get();
-            while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                num += is.get();
-            if (is.peek() == '.')
-            {
-                num += is.get();
-                while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += is.get();
-                if (is.peek() == 'e' || is.peek() == 'E')
-                {
-                    num += is.get();
-                    if (is.peek() == '+')
-                        num += is.get();
-                    if (is.peek() == '-')
-                        num += is.get();
-                    while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                        num += is.get();
-                    return json(num, true);
-                }
-                return json(num, true);
-            }
-            else if (is.peek() == 'e' || is.peek() == 'E')
-            {
-                num += is.get();
-                if (is.peek() == '+')
-                    num += is.get();
-                if (is.peek() == '-')
-                    num += is.get();
-                while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += is.get();
-                return json(num, true);
-            }
-            else
-                return json(num, true);
-        }
-        case '.':
-        {
-            std::string num;
-            num += is.get();
-            while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                num += is.get();
-            if (is.peek() == 'e' || is.peek() == 'E')
-            {
-                num += is.get();
-                if (is.peek() == '+')
-                    num += is.get();
-                if (is.peek() == '-')
-                    num += is.get();
-                while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += is.get();
-                return json(num, true);
-            }
-            return json(num, true);
-        }
-        case 'f':
-        { // we have a false literal..
-            is.get();
-            if (is.get() == 'a' && is.get() == 'l' && is.get() == 's' && is.get() == 'e')
-                return false;
-            throw std::invalid_argument("not a valid json");
-        }
-        case 't':
-        { // we have a true literal..
-            is.get();
-            if (is.get() == 'r' && is.get() == 'u' && is.get() == 'e')
-                return true;
-            throw std::invalid_argument("not a valid json");
-        }
-        case 'n':
-        { // we have a null literal..
-            is.get();
-            switch (is.get())
-            {
-            case 'a':
-                if (is.get() == 'n')
-                    return nullptr;
-                throw std::invalid_argument("not a valid json");
-            case 'u':
-                if (is.get() == 'l' && is.get() == 'l')
-                    return nullptr;
-                throw std::invalid_argument("not a valid json");
-            default:
-                throw std::invalid_argument("not a valid json");
-            }
-        }
-        case '\"': // we have a json string..
-            return parse_string(is);
-        case '/':
-        { // we have a json comment..
-            is.get();
-            if (is.peek() == '/')
-            {
-                while (is.peek() != '\n')
-                    is.get();
-                return load(is);
-            }
-            else if (is.peek() == '*')
-            {
-                while (is.peek() != '*')
-                    is.get();
-                is.get();
-                if (is.peek() == '/')
-                {
-                    is.get();
-                    return load(is);
-                }
-                else
-                    throw std::invalid_argument("not a valid json");
-            }
-            else
-                throw std::invalid_argument("not a valid json");
-        }
-        default:
-            throw std::invalid_argument("not a valid json");
-        }
-    }
-
     std::string parse_string(std::istream &is)
     {
         is.get();
@@ -276,5 +89,192 @@ namespace json
                 val += is.get();
         is.get();
         return val;
+    }
+
+    json load(std::istream &is)
+    {
+        is >> std::ws; // we remove all the leading whitespace..
+        switch (is.peek())
+        {
+        case '{':
+        { // we have a json object..
+            is.get();
+            json vals;
+            is >> std::ws;
+            if (is.peek() == '}')
+            { // we have an empty object..
+                is.get();
+                return vals;
+            }
+            do
+            {
+                is >> std::ws;
+                if (is.peek() != '\"')
+                    throw std::invalid_argument("not a valid json");
+                std::string id = parse_string(is);
+                is >> std::ws;
+                if (is.get() != ':')
+                    throw std::invalid_argument("not a valid json");
+                auto val = load(is);
+                vals[id] = std::move(val);
+                is >> std::ws;
+            } while (is.peek() == ',' && is.get());
+            if (is.get() != '}')
+                throw std::invalid_argument("not a valid json");
+            return vals;
+        }
+        case '[':
+        { // we have a json array..
+            is.get();
+            json vals(json_type::array);
+            if (is.peek() == ']')
+            { // we have an empty array..
+                is.get();
+                return vals;
+            }
+            do
+            {
+                vals.push_back(load(is));
+                is >> std::ws;
+            } while (is.peek() == ',' && is.get());
+            if (is.get() != ']')
+                throw std::invalid_argument("not a valid json");
+            return vals;
+        }
+        case '-': // we have a json number..
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        {
+            std::string num;
+            num += is.get();
+            while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                num += is.get();
+            if (is.peek() == '.')
+            {
+                num += is.get();
+                while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                    num += is.get();
+                if (is.peek() == 'e' || is.peek() == 'E')
+                {
+                    num += is.get();
+                    if (is.peek() == '+')
+                        num += is.get();
+                    if (is.peek() == '-')
+                        num += is.get();
+                    while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                        num += is.get();
+                    return json(std::stod(num));
+                }
+                return json(std::stod(num));
+            }
+            else if (is.peek() == 'e' || is.peek() == 'E')
+            {
+                num += is.get();
+                if (is.peek() == '+')
+                    num += is.get();
+                if (is.peek() == '-')
+                    num += is.get();
+                while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                    num += is.get();
+                return json(std::stod(num));
+            }
+            else
+                return json(std::stol(num));
+        }
+        case '.':
+        {
+            std::string num;
+            num += is.get();
+            while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                num += is.get();
+            if (is.peek() == 'e' || is.peek() == 'E')
+            {
+                num += is.get();
+                if (is.peek() == '+')
+                    num += is.get();
+                if (is.peek() == '-')
+                    num += is.get();
+                while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
+                    num += is.get();
+                return json(std::stod(num));
+            }
+            return json(std::stod(num));
+        }
+        case 'f':
+        { // we have a false literal..
+            is.get();
+            if (is.get() == 'a' && is.get() == 'l' && is.get() == 's' && is.get() == 'e')
+                return false;
+            throw std::invalid_argument("not a valid json");
+        }
+        case 't':
+        { // we have a true literal..
+            is.get();
+            if (is.get() == 'r' && is.get() == 'u' && is.get() == 'e')
+                return true;
+            throw std::invalid_argument("not a valid json");
+        }
+        case 'n':
+        { // we have a null literal..
+            is.get();
+            switch (is.get())
+            {
+            case 'a':
+                if (is.get() == 'n')
+                    return nullptr;
+                throw std::invalid_argument("not a valid json");
+            case 'u':
+                if (is.get() == 'l' && is.get() == 'l')
+                    return nullptr;
+                throw std::invalid_argument("not a valid json");
+            default:
+                throw std::invalid_argument("not a valid json");
+            }
+        }
+        case '\"': // we have a json string..
+            return parse_string(is);
+        case '/':
+        { // we have a json comment..
+            is.get();
+            if (is.peek() == '/')
+            {
+                while (is.peek() != '\n')
+                    is.get();
+                return load(is);
+            }
+            else if (is.peek() == '*')
+            {
+                while (is.peek() != '*')
+                    is.get();
+                is.get();
+                if (is.peek() == '/')
+                {
+                    is.get();
+                    return load(is);
+                }
+                else
+                    throw std::invalid_argument("not a valid json");
+            }
+            else
+                throw std::invalid_argument("not a valid json");
+        }
+        default:
+            throw std::invalid_argument("not a valid json");
+        }
+    }
+
+    json load(const char *str)
+    {
+        std::stringstream ss;
+        ss << str;
+        return load(ss);
     }
 } // namespace json

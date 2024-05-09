@@ -1,7 +1,0 @@
-set(JSON_VERSION 0.1.0)
-
-@PACKAGE_INIT@
-
-set_and_check(JSON_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@/json")
-
-check_required_components(json)
