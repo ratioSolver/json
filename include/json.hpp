@@ -512,13 +512,13 @@ namespace json
       switch (value.index())
       {
       case 1:
-        return std::get<bool>(value) == l;
+        return std::get<bool>(value) == static_cast<bool>(l);
       case 2:
-        return std::get<int64_t>(value) == l;
+        return std::get<int64_t>(value) == static_cast<int64_t>(l);
       case 3:
         return std::get<uint64_t>(value) == static_cast<uint64_t>(l);
       case 4:
-        return std::get<double>(value) == l;
+        return std::get<double>(value) == static_cast<double>(l);
       default:
         return false;
       }

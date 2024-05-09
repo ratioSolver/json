@@ -45,7 +45,7 @@ namespace json
                     char c;
                     for (const auto factor : factors)
                     {
-                        c = is.get();
+                        c = static_cast<char>(is.get());
                         if (c >= '0' && c <= '9')
                             codepoint += static_cast<int>((static_cast<unsigned int>(c) - 0x30u) << factor);
                         else if (c >= 'A' && c <= 'F')
@@ -86,7 +86,7 @@ namespace json
                 }
             }
             else
-                val += is.get();
+                val += static_cast<char>(is.get());
         is.get();
         return val;
     }
@@ -154,36 +154,36 @@ namespace json
         case '9':
         {
             std::string num;
-            num += is.get();
+            num += static_cast<char>(is.get());
             while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                num += is.get();
+                num += static_cast<char>(is.get());
             if (is.peek() == '.')
             {
-                num += is.get();
+                num += static_cast<char>(is.get());
                 while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                 if (is.peek() == 'e' || is.peek() == 'E')
                 {
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                     if (is.peek() == '+')
-                        num += is.get();
+                        num += static_cast<char>(is.get());
                     if (is.peek() == '-')
-                        num += is.get();
+                        num += static_cast<char>(is.get());
                     while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                        num += is.get();
+                        num += static_cast<char>(is.get());
                     return json(std::stod(num));
                 }
                 return json(std::stod(num));
             }
             else if (is.peek() == 'e' || is.peek() == 'E')
             {
-                num += is.get();
+                num += static_cast<char>(is.get());
                 if (is.peek() == '+')
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                 if (is.peek() == '-')
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                 while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                 return json(std::stod(num));
             }
             else
@@ -192,18 +192,18 @@ namespace json
         case '.':
         {
             std::string num;
-            num += is.get();
+            num += static_cast<char>(is.get());
             while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                num += is.get();
+                num += static_cast<char>(is.get());
             if (is.peek() == 'e' || is.peek() == 'E')
             {
-                num += is.get();
+                num += static_cast<char>(is.get());
                 if (is.peek() == '+')
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                 if (is.peek() == '-')
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                 while (is.peek() == '0' || is.peek() == '1' || is.peek() == '2' || is.peek() == '3' || is.peek() == '4' || is.peek() == '5' || is.peek() == '6' || is.peek() == '7' || is.peek() == '8' || is.peek() == '9')
-                    num += is.get();
+                    num += static_cast<char>(is.get());
                 return json(std::stod(num));
             }
             return json(std::stod(num));
