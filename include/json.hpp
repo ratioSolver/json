@@ -157,10 +157,10 @@ namespace json
      * @brief Constructs a `json` object from an initializer list of `json` objects.
      *
      * This constructor allows you to create a `json` object by providing an initializer list
-     * of `json` objects. Each element in the initializer list will be used to construct the
-     * corresponding element in the `json` object.
+     * of `json` objects. The elements in the initializer list will be used to initialize the
+     * `json` object in the same order as they appear in the initializer list.
      *
-     * @param init The initializer list of `json` objects.
+     * @param init An initializer list of `json` objects.
      */
     json(std::initializer_list<json> init);
 

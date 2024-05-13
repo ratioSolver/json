@@ -1,4 +1,5 @@
 #include "json.hpp"
+#include "logging.hpp"
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -7,20 +8,25 @@ namespace json
 {
     json::json(std::initializer_list<json> init)
     {
-        bool is_object = std::all_of(init.begin(), init.end(), [](const json &j)
-                                     { return j.get_type() == json_type::array && j.size() == 2 && j[0].get_type() == json_type::string; });
-        if (is_object)
-        {
+        if (init.size() == 2 && init.begin()->get_type() == json_type::string)
+        { // we have a key-value pair..
+            value = std::map<std::string, json>();
+            std::get<std::map<std::string, json>>(value)[static_cast<std::string>(*init.begin())] = *(init.begin() + 1);
+        }
+        else if (std::all_of(init.begin(), init.end(), [](const json &j)
+                             { return j.get_type() == json_type::object && j.size() == 1; }))
+        { // we have an array of key-value pairs..
             value = std::map<std::string, json>();
             for (const auto &j : init)
-                std::get<std::map<std::string, json>>(value)[static_cast<std::string>(j[0])] = j[1];
+                std::get<std::map<std::string, json>>(value)[static_cast<std::string>(j.as_object().begin()->first)] = j.as_object().begin()->second;
         }
         else
-        {
+        { // we have an array..
             value = std::vector<json>();
             for (const auto &j : init)
                 std::get<std::vector<json>>(value).push_back(j);
         }
+        LOG_INFO(*this);
     }
 
     std::string parse_string(std::istream &is)
