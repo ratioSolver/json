@@ -1,9 +1,28 @@
 #include "json.hpp"
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 
 namespace json
 {
+    json::json(std::initializer_list<json> init)
+    {
+        bool is_object = std::all_of(init.begin(), init.end(), [](const json &j)
+                                     { return j.get_type() == json_type::array && j.size() == 2 && j[0].get_type() == json_type::string; });
+        if (is_object)
+        {
+            value = std::map<std::string, json>();
+            for (const auto &j : init)
+                std::get<std::map<std::string, json>>(value)[static_cast<std::string>(j[0])] = j[1];
+        }
+        else
+        {
+            value = std::vector<json>();
+            for (const auto &j : init)
+                std::get<std::vector<json>>(value).push_back(j);
+        }
+    }
+
     std::string parse_string(std::istream &is)
     {
         is.get();

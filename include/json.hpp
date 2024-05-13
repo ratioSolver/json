@@ -154,37 +154,15 @@ namespace json
     json(std::vector<json> &&arr) noexcept : value(std::move(arr)) {}
 
     /**
-     * @brief Constructs a `json` object from an initializer list.
+     * @brief Constructs a `json` object from an initializer list of `json` objects.
      *
-     * This constructor allows initializing a `json` object using an initializer list.
-     * It supports two types of initializer lists:
-     * 1. If the initializer list contains two elements and the first element is a string,
-     *    it constructs a JSON object with a single key-value pair, where the key is the string
-     *    and the value is the second element of the initializer list.
-     * 2. If the initializer list contains one or more JSON objects, it constructs a JSON object
-     *    by merging all the key-value pairs from the objects in the initializer list.
-     *    If there are duplicate keys, the value from the last object in the list will be used.
-     *    Any other elements in the initializer list are treated as values in a JSON array.
+     * This constructor allows you to create a `json` object by providing an initializer list
+     * of `json` objects. Each element in the initializer list will be used to construct the
+     * corresponding element in the `json` object.
      *
-     * @param init The initializer list to construct the `json` object from.
+     * @param init The initializer list of `json` objects.
      */
-    json(std::initializer_list<json> init)
-    {
-      if (init.size() == 2 && init.begin()->get_type() == json_type::string)
-      {
-        value = std::map<std::string, json>();
-        operator[](static_cast<std::string>(*init.begin())) = *(init.begin() + 1);
-      }
-      else if (init.begin()->get_type() == json_type::object)
-      {
-        value = std::map<std::string, json>();
-        for (auto &obj : init)
-          for (auto &[key, value] : obj.as_object())
-            operator[](key) = value;
-      }
-      else
-        value = std::vector<json>(init);
-    }
+    json(std::initializer_list<json> init);
 
     /**
      * @brief Assignment operator for the json class.
