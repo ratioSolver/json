@@ -1,5 +1,4 @@
 #include "json.hpp"
-#include "logging.hpp"
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -26,7 +25,6 @@ namespace json
             for (const auto &j : init)
                 std::get<std::vector<json>>(value).push_back(j);
         }
-        LOG_INFO(*this);
     }
 
     std::string parse_string(std::istream &is)
