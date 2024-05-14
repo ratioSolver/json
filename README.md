@@ -1,6 +1,7 @@
 # JSON
 
 ![Build Status](https://github.com/ratioSolver/json/actions/workflows/cmake.yml/badge.svg)
+[![codecov](https://codecov.io/gh/ratioSolver/json/branch/master/graph/badge.svg)](https://codecov.io/gh/ratioSolver/json)
 
 This repository contains a [JSON](http://www.json.org/) parser and generator written in C++.
 
