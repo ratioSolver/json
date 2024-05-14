@@ -3,6 +3,47 @@
 #include <sstream>
 #include <cassert>
 
+void test_constructors()
+{
+    json::json j0;
+    assert(j0.get_type() == json::json_type::null);
+    assert(j0 == nullptr);
+    assert(j0.size() == 0);
+
+    json::json j1 = 1;
+    assert(j1.get_type() == json::json_type::number);
+    assert(j1 == 1);
+    assert(j1.size() == 0);
+
+    json::json j2 = 2.0;
+    assert(j2.get_type() == json::json_type::number);
+    assert(j2 == 2.0);
+    assert(j2.size() == 0);
+
+    json::json j3 = "3";
+    assert(j3.get_type() == json::json_type::string);
+    assert(j3 == "3");
+    assert(j3.size() == 0);
+
+    json::json j4 = true;
+    assert(j4.get_type() == json::json_type::boolean);
+    assert(j4 == true);
+    assert(j4.size() == 0);
+
+    json::json j5 = nullptr;
+    assert(j5.get_type() == json::json_type::null);
+    assert(j5 == nullptr);
+    assert(j5.size() == 0);
+
+    json::json j6 = json::json_type::array;
+    assert(j6.get_type() == json::json_type::array);
+    assert(j6.size() == 0);
+
+    json::json j7 = json::json_type::object;
+    assert(j7.get_type() == json::json_type::object);
+    assert(j7.size() == 0);
+}
+
 void test_json()
 {
     std::stringstream ss;
@@ -245,6 +286,8 @@ void test_array_of_scientific_numbers()
 
 int main(int, char **)
 {
+    test_constructors();
+
     test_json();
     test_json_escapes();
     test_json_special_chars();
