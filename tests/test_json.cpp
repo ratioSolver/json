@@ -6,8 +6,8 @@
 void test_constructors()
 {
     json::json j0;
-    assert(j0.get_type() == json::json_type::null);
-    assert(j0 == nullptr);
+    assert(j0.get_type() == json::json_type::object);
+    assert(j0 == json::json{});
     assert(j0.size() == 0);
 
     json::json j1 = 1;
