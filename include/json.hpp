@@ -4,6 +4,7 @@
 #include <variant>
 #include <map>
 #include <vector>
+#include <cstdint>
 
 namespace json
 {
