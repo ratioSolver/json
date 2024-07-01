@@ -360,15 +360,15 @@ namespace json
                     return false;
                 if (schema.contains("minimum"))
                 {
-                    long min = schema["minimum"];
-                    long v = value;
+                    int64_t min = schema["minimum"];
+                    int64_t v = value;
                     if (v < min)
                         return false;
                 }
                 if (schema.contains("maximum"))
                 {
-                    long max = schema["maximum"];
-                    long v = value;
+                    int64_t max = schema["maximum"];
+                    int64_t v = value;
                     if (v > max)
                         return false;
                 }
