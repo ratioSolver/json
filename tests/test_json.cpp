@@ -370,6 +370,110 @@ void test_array_of_scientific_numbers()
     assert(j0.dump() == "[" + std::to_string(1e+10) + "," + std::to_string(1.23e+10) + "," + std::to_string(.23e+10) + "]");
 }
 
+void test_validate()
+{
+    // Test case 1: Validating an object against a schema with properties
+    json::json value1 = {
+        {"name", "John"},
+        {"age", 30},
+        {"city", "New York"}};
+    json::json schema1 = {
+        {"type", "object"},
+        {"properties", {{"name", {{"type", "string"}}}, {"age", {{"type", "number"}}}, {"city", {{"type", "string"}}}}}};
+    json::json schemaRefs1 = {};
+    assert(json::validate(value1, schema1, schemaRefs1));
+
+    // Test case 2: Validating an array against a schema with items
+    json::json value2 = {1, 2, 3, 4, 5};
+    json::json schema2 = {
+        {"type", "array"},
+        {"items", {{"type", "number"}}}};
+    json::json schemaRefs2 = {};
+    assert(json::validate(value2, schema2, schemaRefs2));
+
+    // Test case 3: Validating a string against a schema with enum values
+    json::json value3 = "apple";
+    json::json schema3 = {
+        {"type", "string"},
+        {"enum", {"apple", "banana", "orange"}}};
+    json::json schemaRefs3 = {};
+    assert(json::validate(value3, schema3, schemaRefs3));
+
+    // Test case 4: Validating a number against a schema with minimum and maximum values
+    json::json value4 = 10.5;
+    json::json schema4 = {
+        {"type", "number"},
+        {"minimum", 0},
+        {"maximum", 20}};
+    json::json schemaRefs4 = {};
+    assert(json::validate(value4, schema4, schemaRefs4));
+
+    // Test case 5: Validating a boolean against a schema with type boolean
+    json::json value5 = true;
+    json::json schema5 = {
+        {"type", "boolean"}};
+    json::json schemaRefs5 = {};
+    assert(json::validate(value5, schema5, schemaRefs5));
+
+    // Test case 6: Validating null against a schema with type null
+    json::json value6 = nullptr;
+    json::json schema6 = {
+        {"type", "null"}};
+    json::json schemaRefs6 = {};
+    assert(json::validate(value6, schema6, schemaRefs6));
+
+    // Test case 7: Validating an object against a schema with a reference
+    json::json value7 = {
+        {"name", "John"},
+        {"age", 30},
+        {"city", "New York"}};
+    json::json schema7 = {
+        {"$ref", "#/definitions/person"}};
+    json::json schemaRefs7 = {
+        {"definitions", {{"person", {{"type", "object"}, {"properties", {{"name", {{"type", "string"}}}, {"age", {{"type", "number"}}}, {"city", {{"type", "string"}}}}}}}}}};
+    assert(json::validate(value7, schema7, schemaRefs7));
+
+    // Test case 8: Validating an object against a schema with allOf
+    json::json value8 = {
+        {"name", "John"},
+        {"age", 30},
+        {"city", "New York"}};
+    json::json schema8 = {
+        {"allOf", std::vector<json::json>{{{"type", "object"}, {"properties", {{"name", {{"type", "string"}}}, {"age", {{"type", "number"}}}, {"city", {{"type", "string"}}}}}}}}};
+    json::json schemaRefs8 = {};
+    assert(json::validate(value8, schema8, schemaRefs8));
+
+    // Test case 9: Validating an object against a schema with anyOf
+    json::json value9 = {
+        {"name", "John"},
+        {"age", 30},
+        {"city", "New York"}};
+    json::json schema9 = {
+        {"anyOf", std::vector<json::json>{{{"type", "object"}, {"properties", {{"name", {{"type", "string"}}}, {"age", {{"type", "number"}}}, {"city", {{"type", "string"}}}}}}}}};
+    json::json schemaRefs9 = {};
+    assert(json::validate(value9, schema9, schemaRefs9));
+
+    // Test case 10: Validating an object against a schema with oneOf
+    json::json value10 = {
+        {"name", "John"},
+        {"age", 30},
+        {"city", "New York"}};
+    json::json schema10 = {
+        {"oneOf", std::vector<json::json>{{{"type", "object"}, {"properties", {{"name", {{"type", "string"}}}, {"age", {{"type", "number"}}}, {"city", {{"type", "string"}}}}}}}}};
+    json::json schemaRefs10 = {};
+    assert(json::validate(value10, schema10, schemaRefs10));
+
+    // Test case 11: Validating an object against a schema with not
+    json::json value11 = {
+        {"name", "John"},
+        {"age", 30},
+        {"city", "New York"}};
+    json::json schema11 = {
+        {"not", {{"type", "string"}}}};
+    json::json schemaRefs11 = {};
+    assert(json::validate(value11, schema11, schemaRefs11));
+}
+
 int main()
 {
     test_constructors();
@@ -392,6 +496,8 @@ int main()
 
     test_scientific_numbers();
     test_array_of_scientific_numbers();
+
+    test_validate();
 
     return 0;
 }

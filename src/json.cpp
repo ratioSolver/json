@@ -333,6 +333,7 @@ namespace json
                     return false;
                 if (schema.contains("enum"))
                     return std::find(schema["enum"].as_array().begin(), schema["enum"].as_array().end(), value) != schema["enum"].as_array().end();
+                return true;
             }
             else if (schema["type"] == "number")
             {
@@ -385,8 +386,6 @@ namespace json
         }
         else if (schema.contains("$ref"))
         { // we have a reference to another schema..
-            if (!schema_refs.contains(schema["$ref"]))
-                return false;
             std::string ref = schema["$ref"];
             size_t pos = 0;
             std::string token;
@@ -398,7 +397,8 @@ namespace json
                 {
                     if (!current.contains(token))
                         return false;
-                    current = current[token];
+                    json next = current[token];
+                    current = next;
                 }
                 ref.erase(0, pos + 1);
             }
