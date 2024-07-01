@@ -399,7 +399,7 @@ namespace json
      *
      * @return The type of the JSON value.
      */
-    json_type get_type() const noexcept
+    [[nodiscard]] json_type get_type() const noexcept
     {
       switch (value.index())
       {
@@ -430,7 +430,7 @@ namespace json
      *
      * @return The size of the JSON value.
      */
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
       switch (get_type())
       {
@@ -449,7 +449,7 @@ namespace json
      * @param key The key to check for.
      * @return True if the key is present in the JSON object, false otherwise.
      */
-    bool contains(const std::string &key) const { return get_type() == json_type::object && std::get<std::map<std::string, json>>(value).count(key) > 0; }
+    [[nodiscard]] bool contains(const std::string &key) const { return get_type() == json_type::object && std::get<std::map<std::string, json>>(value).count(key) > 0; }
 
     /**
      * @brief Overloads the equality operator for comparing two json objects.
@@ -459,7 +459,7 @@ namespace json
      * @param other The json object to compare with.
      * @return true if the two json objects are equal, false otherwise.
      */
-    bool operator==(const json &other) const noexcept { return value == other.value; }
+    [[nodiscard]] bool operator==(const json &other) const noexcept { return value == other.value; }
     /**
      * @brief Overloads the equality operator for comparing a json object with a nullptr.
      *
@@ -468,7 +468,7 @@ namespace json
      * @param nullptr_t A null pointer constant.
      * @return true if the json object is null, false otherwise.
      */
-    bool operator==(std::nullptr_t) const noexcept { return value.index() == 0; }
+    [[nodiscard]] bool operator==(std::nullptr_t) const noexcept { return value.index() == 0; }
     /**
      * @brief Overloads the equality operator for comparing a json object with a boolean value.
      *
@@ -477,7 +477,7 @@ namespace json
      * @param b The boolean value to compare with.
      * @return true if the json object is equal to the boolean value, false otherwise.
      */
-    bool operator==(bool b) const noexcept { return value.index() == 1 && std::get<bool>(value) == b; }
+    [[nodiscard]] bool operator==(bool b) const noexcept { return value.index() == 1 && std::get<bool>(value) == b; }
     /**
      * @brief Overloads the equality operator for comparing a json object with an integer value.
      *
@@ -486,7 +486,7 @@ namespace json
      * @param l The integer value to compare with.
      * @return true if the json object is equal to the integer value, false otherwise.
      */
-    bool operator==(int l) const noexcept
+    [[nodiscard]] bool operator==(int l) const noexcept
     {
       switch (value.index())
       {
@@ -510,7 +510,7 @@ namespace json
      * @param l The int64_t value to compare with.
      * @return true if the json object is equal to the int64_t value, false otherwise.
      */
-    bool operator==(int64_t l) const noexcept { return value.index() == 2 && std::get<int64_t>(value) == l; }
+    [[nodiscard]] bool operator==(int64_t l) const noexcept { return value.index() == 2 && std::get<int64_t>(value) == l; }
     /**
      * @brief Overloads the equality operator for comparing a json object with an unsigned 64-bit integer value.
      *
@@ -519,7 +519,7 @@ namespace json
      * @param l The unsigned 64-bit integer value to compare with.
      * @return true if the json object is equal to the unsigned 64-bit integer value, false otherwise.
      */
-    bool operator==(uint64_t l) const noexcept { return value.index() == 3 && std::get<uint64_t>(value) == l; }
+    [[nodiscard]] bool operator==(uint64_t l) const noexcept { return value.index() == 3 && std::get<uint64_t>(value) == l; }
     /**
      * @brief Overloads the equality operator for comparing a json object with a double value.
      *
@@ -528,7 +528,7 @@ namespace json
      * @param d The double value to compare with.
      * @return true if the json object is equal to the double value, false otherwise.
      */
-    bool operator==(double d) const noexcept { return value.index() == 4 && std::get<double>(value) == d; }
+    [[nodiscard]] bool operator==(double d) const noexcept { return value.index() == 4 && std::get<double>(value) == d; }
     /**
      * @brief Overloads the equality operator for comparing a json object with a string.
      *
@@ -537,7 +537,7 @@ namespace json
      * @param str The string to compare with.
      * @return true if the json object is equal to the string, false otherwise.
      */
-    bool operator==(const std::string &str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
+    [[nodiscard]] bool operator==(const std::string &str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
     /**
      * @brief Overloads the equality operator for comparing a json object with a C-style string.
      *
@@ -546,7 +546,7 @@ namespace json
      * @param str The C-style string to compare with.
      * @return true if the json object is equal to the C-style string, false otherwise.
      */
-    bool operator==(const char *str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
+    [[nodiscard]] bool operator==(const char *str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
 
     /**
      * @brief Overloads the inequality operator for comparing two json objects.
@@ -556,7 +556,7 @@ namespace json
      * @param other The json object to compare with.
      * @return true if the two json objects are not equal, false otherwise.
      */
-    bool operator!=(const json &other) const noexcept { return value != other.value; }
+    [[nodiscard]] bool operator!=(const json &other) const noexcept { return value != other.value; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with a nullptr.
      *
@@ -565,7 +565,7 @@ namespace json
      * @param nullptr_t A null pointer constant.
      * @return true if the json object is not null, false otherwise.
      */
-    bool operator!=(std::nullptr_t) const noexcept { return value.index() != 0; }
+    [[nodiscard]] bool operator!=(std::nullptr_t) const noexcept { return value.index() != 0; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with a boolean value.
      *
@@ -574,7 +574,7 @@ namespace json
      * @param b The boolean value to compare with.
      * @return true if the json object is not equal to the boolean value, false otherwise.
      */
-    bool operator!=(bool b) const noexcept { return value.index() != 1 || std::get<bool>(value) != b; }
+    [[nodiscard]] bool operator!=(bool b) const noexcept { return value.index() != 1 || std::get<bool>(value) != b; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with an integer value.
      *
@@ -583,7 +583,7 @@ namespace json
      * @param l The integer value to compare with.
      * @return true if the json object is not equal to the integer value, false otherwise.
      */
-    bool operator!=(int l) const noexcept { return !(*this == l); }
+    [[nodiscard]] bool operator!=(int l) const noexcept { return !(*this == l); }
     /**
      * @brief Overloads the inequality operator for comparing a json object with an int64_t value.
      *
@@ -592,7 +592,7 @@ namespace json
      * @param l The int64_t value to compare with.
      * @return true if the json object is not equal to the int64_t value, false otherwise.
      */
-    bool operator!=(int64_t l) const noexcept { return value.index() != 2 || std::get<int64_t>(value) != l; }
+    [[nodiscard]] bool operator!=(int64_t l) const noexcept { return value.index() != 2 || std::get<int64_t>(value) != l; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with an unsigned 64-bit integer value.
      *
@@ -601,7 +601,7 @@ namespace json
      * @param l The unsigned 64-bit integer value to compare with.
      * @return true if the json object is not equal to the unsigned 64-bit integer value, false otherwise.
      */
-    bool operator!=(uint64_t l) const noexcept { return value.index() != 3 || std::get<uint64_t>(value) != l; }
+    [[nodiscard]] bool operator!=(uint64_t l) const noexcept { return value.index() != 3 || std::get<uint64_t>(value) != l; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with a double value.
      *
@@ -610,7 +610,7 @@ namespace json
      * @param d The double value to compare with.
      * @return true if the json object is not equal to the double value, false otherwise.
      */
-    bool operator!=(double d) const noexcept { return value.index() != 4 || std::get<double>(value) != d; }
+    [[nodiscard]] bool operator!=(double d) const noexcept { return value.index() != 4 || std::get<double>(value) != d; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with a string.
      *
@@ -619,7 +619,7 @@ namespace json
      * @param str The string to compare with.
      * @return true if the json object is not equal to the string, false otherwise.
      */
-    bool operator!=(const std::string &str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
+    [[nodiscard]] bool operator!=(const std::string &str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with a C-style string.
      *
@@ -628,7 +628,7 @@ namespace json
      * @param str The C-style string to compare with.
      * @return true if the json object is not equal to the C-style string, false otherwise.
      */
-    bool operator!=(const char *str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
+    [[nodiscard]] bool operator!=(const char *str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
 
     /**
      * @brief Conversion operator to bool.
@@ -777,7 +777,7 @@ namespace json
      *
      * @return A constant reference to the underlying map object.
      */
-    const std::map<std::string, json> &as_object() const noexcept { return std::get<std::map<std::string, json>>(value); }
+    [[nodiscard]] const std::map<std::string, json> &as_object() const noexcept { return std::get<std::map<std::string, json>>(value); }
 
     /**
      * @brief Conversion operator to std::vector<json>.
@@ -793,7 +793,7 @@ namespace json
      *
      * @return const std::vector<json>& A const reference to the internal vector representation of the JSON value.
      */
-    const std::vector<json> &as_array() const noexcept { return std::get<std::vector<json>>(value); }
+    [[nodiscard]] const std::vector<json> &as_array() const noexcept { return std::get<std::vector<json>>(value); }
 
     /**
      * @brief Clears the JSON object.
@@ -856,7 +856,7 @@ namespace json
      *
      * @return A string representation of the JSON value.
      */
-    std::string dump() const
+    [[nodiscard]] std::string dump() const
     {
       switch (value.index())
       {
@@ -913,7 +913,7 @@ namespace json
    * @param is The input stream to read the JSON object from.
    * @return The loaded JSON object.
    */
-  json load(std::istream &is);
+  [[nodiscard]] json load(std::istream &is);
 
   /**
    * Loads a JSON object from a string.
@@ -921,7 +921,7 @@ namespace json
    * @param str The input string containing the JSON data.
    * @return A JSON object representing the parsed data.
    */
-  json load(const char *str);
+  [[nodiscard]] json load(const char *str);
 
   /**
    * Loads a JSON object from a string.
@@ -929,5 +929,15 @@ namespace json
    * @param str The string containing the JSON object.
    * @return The loaded JSON object.
    */
-  inline json load(const std::string &str) { return load(str.c_str()); }
+  [[nodiscard]] inline json load(const std::string &str) { return load(str.c_str()); }
+
+  /**
+   * Validates a JSON value against a JSON schema.
+   *
+   * @param value The JSON value to be validated.
+   * @param schema The JSON schema to validate against.
+   * @param schema_refs The JSON schema references.
+   * @return `true` if the value is valid according to the schema, `false` otherwise.
+   */
+  [[nodiscard]] bool validate(const json &value, const json &schema, const json &schema_refs);
 } // namespace json

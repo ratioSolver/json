@@ -300,4 +300,134 @@ namespace json
         ss << str;
         return load(ss);
     }
+
+    bool validate(const json &value, const json &schema, const json &schema_refs)
+    {
+        if (schema.contains("type"))
+        { // we have a type..
+            if (schema["type"] == "object")
+            {
+                if (value.get_type() != json_type::object)
+                    return false;
+                for (const auto &property : schema["properties"].as_object())
+                {
+                    if (!value.contains(property.first))
+                        return false;
+                    if (!validate(value[property.first], property.second, schema_refs))
+                        return false;
+                }
+                return true;
+            }
+            else if (schema["type"] == "array")
+            {
+                if (value.get_type() != json_type::array)
+                    return false;
+                for (const auto &v : value.as_array())
+                    if (!validate(v, schema["items"], schema_refs))
+                        return false;
+                return true;
+            }
+            else if (schema["type"] == "string")
+            {
+                if (value.get_type() != json_type::string)
+                    return false;
+                if (schema.contains("enum"))
+                    return std::find(schema["enum"].as_array().begin(), schema["enum"].as_array().end(), value) != schema["enum"].as_array().end();
+            }
+            else if (schema["type"] == "number")
+            {
+                if (value.get_type() != json_type::number)
+                    return false;
+                if (schema.contains("minimum"))
+                {
+                    double min = schema["minimum"];
+                    double v = value;
+                    if (v < min)
+                        return false;
+                }
+                if (schema.contains("maximum"))
+                {
+                    double max = schema["maximum"];
+                    double v = value;
+                    if (v > max)
+                        return false;
+                }
+                return true;
+            }
+            else if (schema["type"] == "integer")
+            {
+                if (value.get_type() != json_type::number)
+                    return false;
+                if (schema.contains("minimum"))
+                {
+                    long min = schema["minimum"];
+                    long v = value;
+                    if (v < min)
+                        return false;
+                }
+                if (schema.contains("maximum"))
+                {
+                    long max = schema["maximum"];
+                    long v = value;
+                    if (v > max)
+                        return false;
+                }
+                return true;
+            }
+            else if (schema["type"] == "boolean")
+                return value.get_type() == json_type::boolean;
+            else if (schema["type"] == "null")
+                return value.get_type() == json_type::null;
+            else if (schema["type"] == "any")
+                return true;
+            else
+                return false;
+        }
+        else if (schema.contains("$ref"))
+        { // we have a reference to another schema..
+            if (!schema_refs.contains(schema["$ref"]))
+                return false;
+            std::string ref = schema["$ref"];
+            size_t pos = 0;
+            std::string token;
+            json current = schema_refs;
+            while ((pos = ref.find('/')) != std::string::npos)
+            {
+                token = ref.substr(0, pos);
+                if (token != "#")
+                {
+                    if (!current.contains(token))
+                        return false;
+                    current = current[token];
+                }
+                ref.erase(0, pos + 1);
+            }
+            return validate(value, current[ref], schema_refs);
+        }
+        else if (schema.contains("allOf"))
+        { // we have a list of schemas that must all be valid..
+            for (const auto &s : schema["allOf"].as_array())
+                if (!validate(value, s, schema_refs))
+                    return false;
+            return true;
+        }
+        else if (schema.contains("anyOf"))
+        { // we have a list of schemas where at least one must be valid..
+            for (const auto &s : schema["anyOf"].as_array())
+                if (validate(value, s, schema_refs))
+                    return true;
+            return false;
+        }
+        else if (schema.contains("oneOf"))
+        { // we have a list of schemas where exactly one must be valid..
+            int count = 0;
+            for (const auto &s : schema["oneOf"].as_array())
+                if (validate(value, s, schema_refs))
+                    count++;
+            return count == 1;
+        }
+        else if (schema.contains("not")) // we have a schema that must not be valid..
+            return !validate(value, schema["not"], schema_refs);
+        return false;
+    }
 } // namespace json

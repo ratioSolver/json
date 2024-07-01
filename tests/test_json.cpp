@@ -370,7 +370,7 @@ void test_array_of_scientific_numbers()
     assert(j0.dump() == "[" + std::to_string(1e+10) + "," + std::to_string(1.23e+10) + "," + std::to_string(.23e+10) + "]");
 }
 
-int main(int, char **)
+int main()
 {
     test_constructors();
     test_constructors2();
