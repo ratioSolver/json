@@ -60,7 +60,7 @@ namespace json
         value = std::vector<json>();
         break;
       case json_type::object:
-        value = std::map<std::string, json>();
+        value = std::map<std::string, json, std::less<>>();
         break;
       }
     }
@@ -137,6 +137,22 @@ namespace json
      * @param str The string to initialize the `json` object with.
      */
     json(const std::string &str) noexcept : value(str) {}
+    /**
+     * @brief Constructs a `json` object from a string rvalue reference.
+     *
+     * This constructor initializes a `json` object with the given string rvalue reference.
+     *
+     * @param str The string rvalue reference to initialize the `json` object with.
+     */
+    json(std::string &&str) noexcept : value(std::move(str)) {}
+    /**
+     * @brief Constructs a `json` object from a string view.
+     *
+     * This constructor initializes a `json` object with the given string view.
+     *
+     * @param str The string view to initialize the `json` object with.
+     */
+    json(std::string_view str) noexcept : value(std::string(str)) {}
     /**
      * @brief Constructs a `json` object from a C-style string.
      *
@@ -316,7 +332,7 @@ namespace json
      * @param str The key to access the value.
      * @return A reference to the value associated with the key.
      */
-    json &operator[](const char *str) { return operator[](std::string(str)); }
+    json &operator[](const char *str) { return std::get<std::map<std::string, json, std::less<>>>(value)[str]; }
     /**
      * @brief Accesses the value associated with the specified key in the JSON object.
      *
@@ -326,7 +342,7 @@ namespace json
      * @param str The key to access the value.
      * @return A reference to the value associated with the key.
      */
-    const json &operator[](const char *str) const { return operator[](std::string(str)); }
+    const json &operator[](const char *str) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(str); }
 
     /**
      * @brief Accesses the value associated with the specified key in the JSON object.
@@ -337,7 +353,7 @@ namespace json
      * @param key The key to access the value.
      * @return A reference to the value associated with the key.
      */
-    json &operator[](const std::string &key) { return std::get<std::map<std::string, json>>(value)[key]; }
+    json &operator[](std::string_view key) { return std::get<std::map<std::string, json, std::less<>>>(value)[std::string(key)]; }
     /**
      * @brief Accesses the value associated with the specified key in the JSON object.
      *
@@ -347,7 +363,28 @@ namespace json
      * @param key The key to access the value.
      * @return A reference to the value associated with the key.
      */
-    const json &operator[](const std::string &key) const { return std::get<std::map<std::string, json>>(value).at(key); }
+    const json &operator[](std::string_view key) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(std::string(key)); }
+
+    /**
+     * @brief Accesses the value associated with the specified key in the JSON object.
+     *
+     * This operator allows you to access the value associated with the specified key in the JSON object.
+     * If the key does not exist, it will be created and associated with a default-constructed JSON value.
+     *
+     * @param key The key to access the value.
+     * @return A reference to the value associated with the key.
+     */
+    json &operator[](const std::string &key) { return std::get<std::map<std::string, json, std::less<>>>(value)[key]; }
+    /**
+     * @brief Accesses the value associated with the specified key in the JSON object.
+     *
+     * This operator allows you to access the value associated with the specified key in the JSON object.
+     * If the key does not exist, it will be created and associated with a default-constructed JSON value.
+     *
+     * @param key The key to access the value.
+     * @return A reference to the value associated with the key.
+     */
+    const json &operator[](const std::string &key) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(key); }
 
     /**
      * @brief Accesses the element at the specified index in the JSON object.
@@ -437,7 +474,7 @@ namespace json
       case json_type::array:
         return std::get<std::vector<json>>(value).size();
       case json_type::object:
-        return std::get<std::map<std::string, json>>(value).size();
+        return std::get<std::map<std::string, json, std::less<>>>(value).size();
       default:
         return 0;
       }
@@ -449,7 +486,7 @@ namespace json
      * @param key The key to check for.
      * @return True if the key is present in the JSON object, false otherwise.
      */
-    [[nodiscard]] bool contains(const std::string &key) const { return get_type() == json_type::object && std::get<std::map<std::string, json>>(value).count(key) > 0; }
+    [[nodiscard]] bool contains(const std::string &key) const { return get_type() == json_type::object && std::get<std::map<std::string, json, std::less<>>>(value).count(key) > 0; }
 
     /**
      * @brief Overloads the equality operator for comparing two json objects.
@@ -653,7 +690,7 @@ namespace json
       case 5:
         return !std::get<std::string>(value).empty();
       case 6:
-        return !std::get<std::map<std::string, json>>(value).empty();
+        return !std::get<std::map<std::string, json, std::less<>>>(value).empty();
       case 7:
         return !std::get<std::vector<json>>(value).empty();
       default:
@@ -764,20 +801,20 @@ namespace json
     }
 
     /**
-     * @brief Conversion operator to std::map<std::string, json>.
+     * @brief Conversion operator to std::map<std::string, json, std::less<>>.
      *
-     * This operator converts the JSON value to a std::map<std::string, json>.
+     * This operator converts the JSON value to a std::map<std::string, json, std::less<>>.
      * The conversion is based on the type of the JSON value.
      *
-     * @return The std::map<std::string, json> value of the JSON object.
+     * @return The std::map<std::string, json, std::less<>> value of the JSON object.
      */
-    operator std::map<std::string, json>() const noexcept { return value.index() == 6 ? std::get<std::map<std::string, json>>(value) : std::map<std::string, json>(); }
+    operator std::map<std::string, json, std::less<>>() const noexcept { return value.index() == 6 ? std::get<std::map<std::string, json, std::less<>>>(value) : std::map<std::string, json, std::less<>>(); }
     /**
      * Returns a constant reference to the underlying map object if the JSON value is an object.
      *
      * @return A constant reference to the underlying map object.
      */
-    [[nodiscard]] const std::map<std::string, json> &as_object() const noexcept { return std::get<std::map<std::string, json>>(value); }
+    [[nodiscard]] const std::map<std::string, json, std::less<>> &as_object() const noexcept { return std::get<std::map<std::string, json, std::less<>>>(value); }
 
     /**
      * @brief Conversion operator to std::vector<json>.
@@ -829,7 +866,7 @@ namespace json
      *
      * @param key The key of the element to be erased.
      */
-    void erase(const std::string &key) { std::get<std::map<std::string, json>>(value).erase(key); }
+    void erase(const std::string &key) { std::get<std::map<std::string, json, std::less<>>>(value).erase(key); }
 
     /**
      * @brief Erases an element at the specified index from the JSON array.
@@ -875,7 +912,7 @@ namespace json
       case 6:
       {
         std::string str = "{";
-        const auto &m = std::get<std::map<std::string, json>>(value);
+        const auto &m = std::get<std::map<std::string, json, std::less<>>>(value);
         for (auto it = m.begin(); it != m.end(); ++it)
         {
           if (it != m.begin())
@@ -904,7 +941,7 @@ namespace json
     friend std::ostream &operator<<(std::ostream &os, const json &j) { return os << j.dump(); }
 
   private:
-    std::variant<std::nullptr_t, bool, int64_t, uint64_t, double, std::string, std::map<std::string, json>, std::vector<json>> value;
+    std::variant<std::nullptr_t, bool, int64_t, uint64_t, double, std::string, std::map<std::string, json, std::less<>>, std::vector<json>> value;
   };
 
   /**

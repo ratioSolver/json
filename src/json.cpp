@@ -9,15 +9,15 @@ namespace json
     {
         if (init.size() == 2 && init.begin()->get_type() == json_type::string)
         { // we have a key-value pair..
-            value = std::map<std::string, json>();
-            std::get<std::map<std::string, json>>(value)[static_cast<std::string>(*init.begin())] = *(init.begin() + 1);
+            value = std::map<std::string, json, std::less<>>();
+            std::get<std::map<std::string, json, std::less<>>>(value)[static_cast<std::string>(*init.begin())] = *(init.begin() + 1);
         }
         else if (std::all_of(init.begin(), init.end(), [](const json &j)
                              { return j.get_type() == json_type::object && j.size() == 1; }))
         { // we have an array of key-value pairs..
-            value = std::map<std::string, json>();
+            value = std::map<std::string, json, std::less<>>();
             for (const auto &j : init)
-                std::get<std::map<std::string, json>>(value)[static_cast<std::string>(j.as_object().begin()->first)] = j.as_object().begin()->second;
+                std::get<std::map<std::string, json, std::less<>>>(value)[static_cast<std::string>(j.as_object().begin()->first)] = j.as_object().begin()->second;
         }
         else
         { // we have an array..
