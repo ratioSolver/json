@@ -324,13 +324,13 @@ namespace json
                     return false;
                 if (schema.contains("minItems"))
                 {
-                    size_t min = schema["minItems"];
+                    uint64_t min = schema["minItems"];
                     if (value.size() < min)
                         return false;
                 }
                 if (schema.contains("maxItems"))
                 {
-                    size_t max = schema["maxItems"];
+                    uint64_t max = schema["maxItems"];
                     if (value.size() > max)
                         return false;
                 }
