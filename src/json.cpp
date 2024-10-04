@@ -322,6 +322,18 @@ namespace json
             {
                 if (value.get_type() != json_type::array)
                     return false;
+                if (schema.contains("minItems"))
+                {
+                    size_t min = schema["minItems"];
+                    if (value.size() < min)
+                        return false;
+                }
+                if (schema.contains("maxItems"))
+                {
+                    size_t max = schema["maxItems"];
+                    if (value.size() > max)
+                        return false;
+                }
                 for (const auto &v : value.as_array())
                     if (!validate(v, schema["items"], schema_refs))
                         return false;
