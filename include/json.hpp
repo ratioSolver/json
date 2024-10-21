@@ -897,19 +897,51 @@ namespace json
     {
       switch (value.index())
       {
-      case 0:
+      case 0: // null
         return "null";
-      case 1:
+      case 1: // boolean
         return std::get<bool>(value) ? "true" : "false";
-      case 2:
+      case 2: // int64_t
         return std::to_string(std::get<int64_t>(value));
-      case 3:
+      case 3: // uint64_t
         return std::to_string(std::get<uint64_t>(value));
-      case 4:
+      case 4: // double
         return std::to_string(std::get<double>(value));
-      case 5:
-        return "\"" + std::get<std::string>(value) + "\"";
-      case 6:
+      case 5: // string
+      {
+        std::string escaped;
+        escaped.reserve(std::get<std::string>(value).size());
+        for (char c : std::get<std::string>(value))
+          switch (c)
+          {
+          case '"':
+            escaped += "\\\"";
+            break;
+          case '\\':
+            escaped += "\\\\";
+            break;
+          case '\b':
+            escaped += "\\b";
+            break;
+          case '\f':
+            escaped += "\\f";
+            break;
+          case '\n':
+            escaped += "\\n";
+            break;
+          case '\r':
+            escaped += "\\r";
+            break;
+          case '\t':
+            escaped += "\\t";
+            break;
+          default:
+            escaped += c;
+            break;
+          }
+        return "\"" + escaped + "\"";
+      }
+      case 6: // object
       {
         std::string str = "{";
         const auto &m = std::get<std::map<std::string, json, std::less<>>>(value);
@@ -921,7 +953,7 @@ namespace json
         }
         return str + "}";
       }
-      case 7:
+      case 7: // array
       {
         std::string str = "[";
         const auto &v = std::get<std::vector<json>>(value);
@@ -933,7 +965,7 @@ namespace json
         }
         return str + "]";
       }
-      default:
+      default: // should never happen
         return "";
       }
     }
