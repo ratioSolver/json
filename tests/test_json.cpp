@@ -183,6 +183,7 @@ void test_json_escapes()
 }
 )";
     json::json j = json::load(ss);
+    assert(j["choices"][0]["message"]["function_call"]["arguments"].dump() == "\"{\\n  \\\"purpose\\\": \\\"attività personalizzate\\\"\\n}\"");
 }
 
 void test_json_special_chars()
