@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <cstdint>
+#include <iostream>
 
 namespace json
 {
