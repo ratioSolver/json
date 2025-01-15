@@ -300,6 +300,13 @@ namespace json
         return load(ss);
     }
 
+    json load(std::string_view str)
+    {
+        std::stringstream ss;
+        ss << str;
+        return load(ss);
+    }
+
     bool validate(const json &value, const json &schema, const json &schema_refs)
     {
         if (schema.contains("type"))
