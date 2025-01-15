@@ -132,14 +132,6 @@ namespace json
      */
     json(double d) noexcept : value(d) {}
     /**
-     * @brief Constructs a `json` object from a string.
-     *
-     * This constructor initializes a `json` object with the given string.
-     *
-     * @param str The string to initialize the `json` object with.
-     */
-    json(const std::string &str) noexcept : value(str) {}
-    /**
      * @brief Constructs a `json` object from a string rvalue reference.
      *
      * This constructor initializes a `json` object with the given string rvalue reference.
@@ -154,7 +146,7 @@ namespace json
      *
      * @param str The string view to initialize the `json` object with.
      */
-    json(std::string_view str) noexcept : value(std::string(str)) {}
+    json(std::string_view str) noexcept : value(str.data()) {}
     /**
      * @brief Constructs a `json` object from a C-style string.
      *
@@ -162,7 +154,7 @@ namespace json
      *
      * @param str The C-style string to be converted into a `json` object.
      */
-    json(const char *str) noexcept : value(std::string(str)) {}
+    json(const char *str) noexcept : value(str) {}
     /**
      * @brief Constructs a `json` object from a vector of `json` objects.
      *
@@ -233,9 +225,9 @@ namespace json
      * @param str The string value to assign.
      * @return A reference to the modified JSON object.
      */
-    json &operator=(const std::string &str) noexcept
+    json &operator=(std::string_view str) noexcept
     {
-      value = str;
+      value = str.data();
       return *this;
     }
 
@@ -250,7 +242,7 @@ namespace json
      */
     json &operator=(const char *str) noexcept
     {
-      value = std::string(str);
+      value = str;
       return *this;
     }
 
@@ -355,7 +347,7 @@ namespace json
      * @param key The key to access the value.
      * @return A reference to the value associated with the key.
      */
-    json &operator[](std::string_view key) { return std::get<std::map<std::string, json, std::less<>>>(value)[std::string(key)]; }
+    json &operator[](std::string_view key) { return std::get<std::map<std::string, json, std::less<>>>(value)[key.data()]; }
     /**
      * @brief Accesses the value associated with the specified key in the JSON object.
      *
@@ -365,28 +357,7 @@ namespace json
      * @param key The key to access the value.
      * @return A reference to the value associated with the key.
      */
-    const json &operator[](std::string_view key) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(std::string(key)); }
-
-    /**
-     * @brief Accesses the value associated with the specified key in the JSON object.
-     *
-     * This operator allows you to access the value associated with the specified key in the JSON object.
-     * If the key does not exist, it will be created and associated with a default-constructed JSON value.
-     *
-     * @param key The key to access the value.
-     * @return A reference to the value associated with the key.
-     */
-    json &operator[](const std::string &key) { return std::get<std::map<std::string, json, std::less<>>>(value)[key]; }
-    /**
-     * @brief Accesses the value associated with the specified key in the JSON object.
-     *
-     * This operator allows you to access the value associated with the specified key in the JSON object.
-     * If the key does not exist, it will be created and associated with a default-constructed JSON value.
-     *
-     * @param key The key to access the value.
-     * @return A reference to the value associated with the key.
-     */
-    const json &operator[](const std::string &key) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(key); }
+    const json &operator[](std::string_view key) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(key.data()); }
 
     /**
      * @brief Accesses the element at the specified index in the JSON object.
@@ -488,7 +459,7 @@ namespace json
      * @param key The key to check for.
      * @return True if the key is present in the JSON object, false otherwise.
      */
-    [[nodiscard]] bool contains(const std::string &key) const { return get_type() == json_type::object && std::get<std::map<std::string, json, std::less<>>>(value).count(key) > 0; }
+    [[nodiscard]] bool contains(std::string_view key) const { return get_type() == json_type::object && std::get<std::map<std::string, json, std::less<>>>(value).count(key) > 0; }
 
     /**
      * @brief Overloads the equality operator for comparing two json objects.
@@ -576,7 +547,7 @@ namespace json
      * @param str The string to compare with.
      * @return true if the json object is equal to the string, false otherwise.
      */
-    [[nodiscard]] bool operator==(const std::string &str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
+    [[nodiscard]] bool operator==(std::string_view str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
     /**
      * @brief Overloads the equality operator for comparing a json object with a C-style string.
      *
@@ -658,7 +629,7 @@ namespace json
      * @param str The string to compare with.
      * @return true if the json object is not equal to the string, false otherwise.
      */
-    [[nodiscard]] bool operator!=(const std::string &str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
+    [[nodiscard]] bool operator!=(std::string_view str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
     /**
      * @brief Overloads the inequality operator for comparing a json object with a C-style string.
      *
@@ -868,7 +839,7 @@ namespace json
      *
      * @param key The key of the element to be erased.
      */
-    void erase(const std::string &key) { std::get<std::map<std::string, json, std::less<>>>(value).erase(key); }
+    void erase(std::string_view key) { std::get<std::map<std::string, json, std::less<>>>(value).erase(key.data()); }
 
     /**
      * @brief Erases an element at the specified index from the JSON array.
@@ -1000,7 +971,7 @@ namespace json
    * @param str The string containing the JSON object.
    * @return The loaded JSON object.
    */
-  [[nodiscard]] inline json load(const std::string &str) { return load(str.c_str()); }
+  [[nodiscard]] inline json load(const std::string &str);
 
   /**
    * Validates a JSON value against a JSON schema.
