@@ -960,18 +960,10 @@ namespace json
   /**
    * Loads a JSON object from a string.
    *
-   * @param str The input string containing the JSON data.
-   * @return A JSON object representing the parsed data.
-   */
-  [[nodiscard]] json load(const char *str);
-
-  /**
-   * Loads a JSON object from a string.
-   *
    * @param str The string containing the JSON object.
    * @return The loaded JSON object.
    */
-  [[nodiscard]] inline json load(const std::string &str);
+  [[nodiscard]] json load(std::string_view str);
 
   /**
    * Validates a JSON value against a JSON schema.

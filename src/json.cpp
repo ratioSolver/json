@@ -293,13 +293,6 @@ namespace json
         }
     }
 
-    json load(const char *str)
-    {
-        std::stringstream ss;
-        ss << str;
-        return load(ss);
-    }
-
     json load(std::string_view str)
     {
         std::stringstream ss;
