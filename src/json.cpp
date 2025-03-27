@@ -149,6 +149,7 @@ namespace json
         { // we have a json array..
             is.get();
             json vals(json_type::array);
+            is >> std::ws;
             if (is.peek() == ']')
             { // we have an empty array..
                 is.get();
