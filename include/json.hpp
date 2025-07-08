@@ -402,6 +402,81 @@ namespace json
     const json &operator[](size_t index) const { return std::get<std::vector<json>>(value).at(index); }
 
     /**
+     * @brief Checks if the JSON value is null.
+     *
+     * @return true if the JSON value is null, false otherwise.
+     */
+    [[nodiscard]] bool is_null() const noexcept { return value.index() == 0; }
+    /**
+     * @brief Checks if the JSON value is a boolean.
+     *
+     * @return true if the JSON value is a boolean, false otherwise.
+     */
+    [[nodiscard]] bool is_boolean() const noexcept { return value.index() == 1; }
+    /**
+     * @brief Checks if the JSON value is an integer.
+     *
+     * @return true if the JSON value is an integer, false otherwise.
+     */
+    [[nodiscard]] bool is_integer() const noexcept { return value.index() == 2; }
+    /**
+     * @brief Checks if the JSON value is an unsigned integer.
+     *
+     * @return true if the JSON value is an unsigned integer, false otherwise.
+     */
+    [[nodiscard]] bool is_unsigned() const noexcept { return value.index() == 3; }
+    /**
+     * @brief Checks if the JSON value is a floating-point number.
+     *
+     * @return true if the JSON value is a floating-point number, false otherwise.
+     */
+    [[nodiscard]] bool is_float() const noexcept { return value.index() == 4; }
+    /**
+     * @brief Checks if the JSON value is a number.
+     *
+     * This function checks if the JSON value is of type integer, unsigned integer, or floating-point number.
+     *
+     * @return true if the JSON value is a number, false otherwise.
+     */
+    [[nodiscard]] bool is_number() const noexcept { return value.index() == 2 || value.index() == 3 || value.index() == 4; }
+    /**
+     * @brief Checks if the JSON value is a string.
+     *
+     * @return true if the JSON value is a string, false otherwise.
+     */
+    [[nodiscard]] bool is_string() const noexcept { return value.index() == 5; }
+    /**
+     * @brief Checks if the JSON value is an object.
+     *
+     * @return true if the JSON value is an object, false otherwise.
+     */
+    [[nodiscard]] bool is_object() const noexcept { return value.index() == 6; }
+    /**
+     * @brief Checks if the JSON value is an array.
+     *
+     * @return true if the JSON value is an array, false otherwise.
+     */
+    [[nodiscard]] bool is_array() const noexcept { return value.index() == 7; }
+
+    /**
+     * @brief Checks if the JSON value is a primitive type.
+     *
+     * This function checks if the JSON value is of a primitive type, which includes null, boolean, integer, unsigned integer,
+     * floating-point number, or string.
+     *
+     * @return true if the JSON value is a primitive type, false otherwise.
+     */
+    [[nodiscard]] bool is_primitive() const noexcept { return is_null() || is_boolean() || is_integer() || is_unsigned() || is_float() || is_string(); }
+    /**
+     * @brief Checks if the JSON value is a structured type.
+     *
+     * This function checks if the JSON value is either an object or an array.
+     *
+     * @return true if the JSON value is a structured type (object or array), false otherwise.
+     */
+    [[nodiscard]] bool is_structured() const noexcept { return is_object() || is_array(); }
+
+    /**
      * @brief Returns the type of the JSON value.
      *
      * This function returns the type of the JSON value as an enum value of the `json_type` enumeration.
@@ -459,7 +534,7 @@ namespace json
      * @param key The key to check for.
      * @return True if the key is present in the JSON object, false otherwise.
      */
-    [[nodiscard]] bool contains(std::string_view key) const { return get_type() == json_type::object && std::get<std::map<std::string, json, std::less<>>>(value).count(key) > 0; }
+    [[nodiscard]] bool contains(std::string_view key) const { return is_object() && std::get<std::map<std::string, json, std::less<>>>(value).count(key) > 0; }
 
     /**
      * @brief Overloads the equality operator for comparing two json objects.

@@ -7,39 +7,51 @@ void test_constructors()
 {
     json::json j0;
     assert(j0.get_type() == json::json_type::object);
+    assert(j0.is_object());
     assert(j0.size() == 0);
 
     json::json j1(1);
     assert(j1.get_type() == json::json_type::number);
+    assert(j1.is_number());
+    assert(j1.is_integer());
+    assert(!j1.is_float());
     assert(j1 == 1);
     assert(j1.size() == 0);
 
     json::json j2(2.0);
     assert(j2.get_type() == json::json_type::number);
+    assert(j2.is_number());
+    assert(!j2.is_integer());
+    assert(j2.is_float());
     assert(j2 == 2.0);
     assert(j2.size() == 0);
 
     json::json j3("3");
     assert(j3.get_type() == json::json_type::string);
+    assert(j3.is_string());
     assert(j3 == "3");
     assert(j3.size() == 0);
 
     json::json j4(true);
     assert(j4.get_type() == json::json_type::boolean);
+    assert(j4.is_boolean());
     assert(j4 == true);
     assert(j4.size() == 0);
 
     json::json j5(nullptr);
     assert(j5.get_type() == json::json_type::null);
+    assert(j5.is_null());
     assert(j5 == nullptr);
     assert(j5.size() == 0);
 
     json::json j6(json::json_type::array);
     assert(j6.get_type() == json::json_type::array);
+    assert(j6.is_array());
     assert(j6.size() == 0);
 
     json::json j7(json::json_type::object);
     assert(j7.get_type() == json::json_type::object);
+    assert(j7.is_object());
     assert(j7.size() == 0);
 }
 
@@ -47,29 +59,36 @@ void test_constructors2()
 {
     json::json j0(json::json_type::null);
     assert(j0.get_type() == json::json_type::null);
+    assert(j0.is_null());
     assert(j0 == nullptr);
     assert(j0.size() == 0);
 
     json::json j1(json::json_type::array);
     assert(j1.get_type() == json::json_type::array);
+    assert(j1.is_array());
     assert(j1.size() == 0);
 
     json::json j2(json::json_type::object);
     assert(j2.get_type() == json::json_type::object);
+    assert(j2.is_object());
     assert(j2.size() == 0);
 
     json::json j3(json::json_type::number);
     assert(j3.get_type() == json::json_type::number);
+    assert(j3.is_number());
+    assert(j3.is_integer() || j3.is_float());
     assert(j3 == 0);
     assert(j3.size() == 0);
 
     json::json j4(json::json_type::string);
     assert(j4.get_type() == json::json_type::string);
+    assert(j4.is_string());
     assert(j4 == "");
     assert(j4.size() == 0);
 
     json::json j5(json::json_type::boolean);
     assert(j5.get_type() == json::json_type::boolean);
+    assert(j5.is_boolean());
     assert(j5 == false);
     assert(j5.size() == 0);
 
@@ -78,11 +97,14 @@ void test_constructors2()
     j6.push_back(2);
     j6.push_back(3);
     assert(j6.get_type() == json::json_type::array);
+    assert(j6.is_array());
     assert(j6.size() == 3);
 
     json::json j7(std::move(j6));
     assert(j6.get_type() == json::json_type::null);
+    assert(j6.is_null());
     assert(j7.get_type() == json::json_type::array);
+    assert(j7.is_array());
     assert(j7.size() == 3);
     assert(j7[0] == 1);
     assert(j7[1] == 2);
@@ -98,35 +120,46 @@ void test_assignments()
 
     json::json j1 = 1;
     assert(j1.get_type() == json::json_type::number);
+    assert(j1.is_number());
+    assert(j1.is_integer());
+    assert(!j1.is_float());
     assert(j1 == 1);
     assert(j1.size() == 0);
 
     json::json j2 = 2.0;
     assert(j2.get_type() == json::json_type::number);
+    assert(j2.is_number());
+    assert(!j2.is_integer());
+    assert(j2.is_float());
     assert(j2 == 2.0);
     assert(j2.size() == 0);
 
     json::json j3 = "3";
     assert(j3.get_type() == json::json_type::string);
+    assert(j3.is_string());
     assert(j3 == "3");
     assert(j3.size() == 0);
 
     json::json j4 = true;
     assert(j4.get_type() == json::json_type::boolean);
+    assert(j4.is_boolean());
     assert(j4 == true);
     assert(j4.size() == 0);
 
     json::json j5 = nullptr;
     assert(j5.get_type() == json::json_type::null);
+    assert(j5.is_null());
     assert(j5 == nullptr);
     assert(j5.size() == 0);
 
     json::json j6 = json::json_type::array;
     assert(j6.get_type() == json::json_type::array);
+    assert(j6.is_array());
     assert(j6.size() == 0);
 
     json::json j7 = json::json_type::object;
     assert(j7.get_type() == json::json_type::object);
+    assert(j7.is_object());
     assert(j7.size() == 0);
 }
 
@@ -329,6 +362,7 @@ void test_null()
     json::json j0 = nullptr;
     assert(j0 == nullptr);
     assert(j0.get_type() == json::json_type::null);
+    assert(j0.is_null());
     assert(j0.dump() == "null");
 }
 
@@ -336,6 +370,7 @@ void test_empty_array()
 {
     json::json j0 = json::json_type::array;
     assert(j0.get_type() == json::json_type::array);
+    assert(j0.is_array());
     assert(j0.dump() == "[]");
 }
 
@@ -343,6 +378,7 @@ void test_empty_object()
 {
     json::json j0 = json::json_type::object;
     assert(j0.get_type() == json::json_type::object);
+    assert(j0.is_object());
     assert(j0.dump() == "{}");
 }
 
@@ -350,14 +386,23 @@ void test_scientific_numbers()
 {
     json::json j0 = 1e+10;
     assert(j0.get_type() == json::json_type::number);
+    assert(j0.is_number());
+    assert(!j0.is_integer());
+    assert(j0.is_float());
     assert(j0.dump() == std::to_string(1e+10));
 
     json::json j1 = 1.23e+10;
     assert(j1.get_type() == json::json_type::number);
+    assert(j1.is_number());
+    assert(!j1.is_integer());
+    assert(j1.is_float());
     assert(j1.dump() == std::to_string(1.23e+10));
 
     json::json j2 = .23e+10;
     assert(j2.get_type() == json::json_type::number);
+    assert(j2.is_number());
+    assert(!j2.is_integer());
+    assert(j2.is_float());
     assert(j2.dump() == std::to_string(.23e+10));
 }
 
@@ -368,6 +413,15 @@ void test_array_of_scientific_numbers()
     j0.push_back(1.23e+10);
     j0.push_back(.23e+10);
     assert(j0.get_type() == json::json_type::array);
+    assert(j0[0].is_number());
+    assert(!j0[0].is_integer());
+    assert(j0[0].is_float());
+    assert(j0[1].is_number());
+    assert(!j0[1].is_integer());
+    assert(j0[1].is_float());
+    assert(j0[2].is_number());
+    assert(!j0[2].is_integer());
+    assert(j0[2].is_float());
     assert(j0.dump() == "[" + std::to_string(1e+10) + "," + std::to_string(1.23e+10) + "," + std::to_string(.23e+10) + "]");
 }
 

@@ -6,13 +6,13 @@ namespace json
 {
     json::json(std::initializer_list<json> init)
     {
-        if (init.size() == 2 && init.begin()->get_type() == json_type::string)
+        if (init.size() == 2 && init.begin()->is_string())
         { // we have a key-value pair..
             value = std::map<std::string, json, std::less<>>();
             std::get<std::map<std::string, json, std::less<>>>(value)[static_cast<std::string>(*init.begin())] = *(init.begin() + 1);
         }
         else if (std::all_of(init.begin(), init.end(), [](const json &j)
-                             { return j.get_type() == json_type::object && j.size() == 1; }))
+                             { return j.is_object() && j.size() == 1; }))
         { // we have an array of key-value pairs..
             value = std::map<std::string, json, std::less<>>();
             for (const auto &j : init)
@@ -307,7 +307,7 @@ namespace json
         { // we have a type..
             if (schema["type"] == "object")
             {
-                if (value.get_type() != json_type::object)
+                if (!value.is_object())
                     return false;
                 for (const auto &property : schema["properties"].as_object())
                 {
@@ -320,7 +320,7 @@ namespace json
             }
             else if (schema["type"] == "array")
             {
-                if (value.get_type() != json_type::array)
+                if (!value.is_array())
                     return false;
                 if (schema.contains("minItems"))
                 {
@@ -341,7 +341,7 @@ namespace json
             }
             else if (schema["type"] == "string")
             {
-                if (value.get_type() != json_type::string)
+                if (!value.is_string())
                     return false;
                 if (schema.contains("enum"))
                     return std::find(schema["enum"].as_array().begin(), schema["enum"].as_array().end(), value) != schema["enum"].as_array().end();
@@ -349,7 +349,7 @@ namespace json
             }
             else if (schema["type"] == "number")
             {
-                if (value.get_type() != json_type::number)
+                if (!value.is_number())
                     return false;
                 if (schema.contains("minimum"))
                 {
@@ -369,7 +369,7 @@ namespace json
             }
             else if (schema["type"] == "integer")
             {
-                if (value.get_type() != json_type::number)
+                if (!value.is_number())
                     return false;
                 if (schema.contains("minimum"))
                 {
@@ -388,9 +388,9 @@ namespace json
                 return true;
             }
             else if (schema["type"] == "boolean")
-                return value.get_type() == json_type::boolean;
+                return value.is_boolean();
             else if (schema["type"] == "null")
-                return value.get_type() == json_type::null;
+                return value.is_null();
             else if (schema["type"] == "any")
                 return true;
             else
