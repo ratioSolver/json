@@ -42,12 +42,11 @@ namespace json
      *
      * @param type The type of the JSON object to be constructed.
      */
-    json(json_type type = json_type::object) noexcept
+    json(json_type type = json_type::object) noexcept : value(nullptr)
     {
       switch (type)
       {
       case json_type::null:
-        value = nullptr;
         break;
       case json_type::boolean:
         value = false;
