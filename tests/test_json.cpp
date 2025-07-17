@@ -274,11 +274,11 @@ void test_json_comparison()
 
     assert(j0 == j1);
 
-    j0["f"] = json::json_type::array;
+    j0["f"] = json::json(json::json_type::array);
     j0["f"].push_back(1);
     j0["f"].push_back(2);
 
-    j1["f"] = json::json_type::array;
+    j1["f"] = json::json(json::json_type::array);
     j1["f"].push_back(1);
     j1["f"].push_back(2);
 
@@ -296,7 +296,7 @@ void test_move_semantics()
     j0["c"] = "3";
     j0["d"] = true;
     j0["e"] = nullptr;
-    j0["f"] = json::json_type::array;
+    j0["f"] = json::json(json::json_type::array);
     j0["f"].push_back(1);
     j0["f"].push_back(2);
     j0["f"].push_back(3);
@@ -339,7 +339,7 @@ void test_iterate()
     j0["c"] = "3";
     j0["d"] = true;
     j0["e"] = nullptr;
-    j0["f"] = json::json_type::array;
+    j0["f"] = json::json(json::json_type::array);
     j0["f"].push_back(1);
     j0["f"].push_back(2);
     j0["f"].push_back(3);

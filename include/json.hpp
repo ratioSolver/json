@@ -66,103 +66,26 @@ namespace json
         break;
       }
     }
+
     /**
      * @brief Copy constructor for the json class.
      *
-     * This constructor creates a new json object by copying the contents of another json object.
+     * This constructor creates a new json object as a copy of another json object.
      *
      * @param other The json object to be copied.
      */
-    json(const json &other) noexcept : value(other.value) {}
+    json(const json &other) : value(other.value) {}
+
     /**
-     * @brief Move constructor for the json class.
+     * @brief Constructs a JSON object from a value of type T.
      *
-     * This constructor moves the contents of the `other` object into the newly created `json` object.
-     * The `other` object is left in a valid but unspecified state.
+     * This constructor allows you to create a `json` object from any type that can be converted to a JSON value.
+     * The type T must be convertible to one of the supported JSON types (null, boolean, number, string, array, or object).
      *
-     * @param other The `json` object to be moved from.
+     * @param v The value to be converted to a JSON object.
      */
-    json(json &&other) noexcept : value(std::move(other.value)) { other.value = nullptr; }
-    /**
-     * @brief Constructs a `json` object from a `nullptr_t`.
-     *
-     * This constructor creates a `json` object with a null value.
-     *
-     * @param[in] nullptr_t A null pointer constant.
-     */
-    json(std::nullptr_t) noexcept : value(nullptr) {}
-    /**
-     * @brief Constructs a `json` object from a boolean value.
-     *
-     * This constructor initializes a `json` object with the given boolean value.
-     *
-     * @param b The boolean value to initialize the `json` object with.
-     */
-    json(bool b) noexcept : value(b) {}
-    /**
-     * @brief Constructs a `json` object with an integer value.
-     *
-     * This constructor initializes a `json` object with the given integer value.
-     *
-     * @param l The integer value to initialize the `json` object with.
-     */
-    json(int l) noexcept : value(static_cast<int64_t>(l)) {}
-    /**
-     * @brief Constructs a `json` object from an int64_t value.
-     *
-     * This constructor initializes a `json` object with the given int64_t value.
-     *
-     * @param l The int64_t value to initialize the `json` object with.
-     */
-    json(int64_t l) noexcept : value(l) {}
-    /**
-     * @brief Constructs a `json` object with an unsigned 64-bit integer value.
-     *
-     * This constructor initializes a `json` object with the provided unsigned 64-bit integer value.
-     *
-     * @param l The unsigned 64-bit integer value to initialize the `json` object with.
-     */
-    json(uint64_t l) noexcept : value(l) {}
-    /**
-     * @brief Constructs a `json` object from a double value.
-     *
-     * This constructor initializes a `json` object with the given double value.
-     *
-     * @param d The double value to initialize the `json` object with.
-     */
-    json(double d) noexcept : value(d) {}
-    /**
-     * @brief Constructs a `json` object from a string rvalue reference.
-     *
-     * This constructor initializes a `json` object with the given string rvalue reference.
-     *
-     * @param str The string rvalue reference to initialize the `json` object with.
-     */
-    json(std::string &&str) noexcept : value(std::move(str)) {}
-    /**
-     * @brief Constructs a `json` object from a string view.
-     *
-     * This constructor initializes a `json` object with the given string view.
-     *
-     * @param str The string view to initialize the `json` object with.
-     */
-    json(std::string_view str) noexcept : value(str.data()) {}
-    /**
-     * @brief Constructs a `json` object from a C-style string.
-     *
-     * This constructor creates a `json` object by converting the given C-style string into a `std::string`.
-     *
-     * @param str The C-style string to be converted into a `json` object.
-     */
-    json(const char *str) noexcept : value(str) {}
-    /**
-     * @brief Constructs a `json` object from a vector of `json` objects.
-     *
-     * This constructor initializes a `json` object with the given vector of `json` objects.
-     *
-     * @param arr The vector of `json` objects to initialize the `json` object with.
-     */
-    json(std::vector<json> &&arr) noexcept : value(std::move(arr)) {}
+    template <typename T, std::enable_if_t<!std::is_same_v<std::decay_t<T>, json>, int> = 0>
+    json(T &&v) : value(std::forward<T>(v)) {}
 
     /**
      * @brief Constructs a `json` object from an initializer list of `json` objects.
@@ -190,216 +113,75 @@ namespace json
     }
 
     /**
-     * @brief Move assignment operator for the json class.
+     * @brief Assignment operator for the json class.
      *
-     * This operator allows the json object to be assigned the contents of another json object using move semantics.
+     * This operator allows you to assign a value of type T to the current json object.
+     * The type T must be convertible to one of the supported JSON types (null, boolean, number, string, array, or object).
      *
-     * @param other The json object to be moved from.
-     * @return A reference to the modified json object.
+     * @param v The value to be assigned to the json object.
+     * @return A reference to the current json object after assignment.
      */
-    json &operator=(json &&other) noexcept
+    template <typename T, std::enable_if_t<!std::is_same_v<std::decay_t<T>, json>, int> = 0>
+    json &operator=(T &&v)
     {
-      value = std::move(other.value);
+      value = std::forward<T>(v);
       return *this;
     }
 
     /**
-     * @brief Assignment operator overload for assigning a nullptr to a json object.
+     * @brief Accesses the JSON value associated with the given key.
      *
-     * This operator allows assigning a nullptr to a json object. It sets the value of the json object to nullptr.
+     * This operator allows access to the JSON object element corresponding to the specified key.
+     * If the key does not exist, a new element is created and returned.
      *
-     * @param[in] nullptr_t The nullptr to assign to the json object.
-     * @return json& A reference to the modified json object.
+     * @tparam Key Type of the key, which must be convertible to std::string.
+     * @param key The key to access in the JSON object.
+     * @return Reference to the JSON value associated with the key.
      */
-    json &operator=(std::nullptr_t) noexcept
-    {
-      value = nullptr;
-      return *this;
-    }
+    template <typename Key, std::enable_if_t<std::is_same_v<std::decay_t<Key>, const char *> || std::is_same_v<std::decay_t<Key>, std::string> || std::is_same_v<std::decay_t<Key>, std::string_view>, int> = 0>
+    json &operator[](Key &&key) { return std::get<std::map<std::string, json, std::less<>>>(value)[std::string(std::forward<Key>(key))]; }
 
     /**
-     * @brief Assigns a string value to the JSON object.
+     * @brief Accesses the JSON value associated with the given key.
      *
-     * This assignment operator allows you to assign a string value to a JSON object.
+     * This operator allows access to the JSON object element corresponding to the specified key.
+     * If the key does not exist, an exception is thrown.
      *
-     * @param str The string value to assign.
-     * @return A reference to the modified JSON object.
+     * @tparam Key Type of the key, which must be convertible to std::string.
+     * @param key The key to access in the JSON object.
+     * @return A constant reference to the JSON value associated with the key.
      */
-    json &operator=(std::string_view str) noexcept
-    {
-      value = str.data();
-      return *this;
-    }
+    template <typename Key, std::enable_if_t<std::is_same_v<std::decay_t<Key>, const char *> || std::is_same_v<std::decay_t<Key>, std::string> || std::is_same_v<std::decay_t<Key>, std::string_view>, int> = 0>
+    const json &operator[](Key &&key) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(std::string(std::forward<Key>(key))); }
 
     /**
-     * @brief Assignment operator overload for assigning a C-style string to a json object.
+     * @brief Accesses the JSON value at the specified index.
      *
-     * This operator allows you to assign a C-style string to a json object. The C-style string
-     * is converted to a std::string and assigned to the 'value' member variable of the json object.
+     * This operator allows access to the JSON array element at the specified index.
+     * If the index is out of bounds, an exception is thrown.
      *
-     * @param str The C-style string to assign to the json object.
-     * @return A reference to the modified json object.
+     * @tparam Index Type of the index, which must be an integral type.
+     * @param idx The index to access in the JSON array.
+     * @return Reference to the JSON value at the specified index.
      */
-    json &operator=(const char *str) noexcept
-    {
-      value = str;
-      return *this;
-    }
+    template <typename Index, std::enable_if_t<std::is_integral_v<Index>, int> = 0>
+    json &operator[](Index idx) { return std::get<std::vector<json>>(value)[static_cast<size_t>(idx)]; }
 
     /**
-     * @brief Assignment operator for assigning a boolean value to a JSON object.
+     * @brief Accesses the JSON value at the specified index.
      *
-     * This operator assigns a boolean value to a JSON object and returns a reference to the modified object.
+     * This operator allows access to the JSON array element at the specified index.
+     * If the index is out of bounds, an exception is thrown.
      *
-     * @param b The boolean value to be assigned.
-     * @return A reference to the modified JSON object.
+     * @tparam Index Type of the index, which must be an integral type.
+     * @param idx The index to access in the JSON array.
+     * @return A constant reference to the JSON value at the specified index.
      */
-    json &operator=(bool b) noexcept
-    {
-      value = b;
-      return *this;
-    }
+    template <typename Index, std::enable_if_t<std::is_integral_v<Index>, int> = 0>
+    const json &operator[](Index idx) const { return std::get<std::vector<json>>(value).at(static_cast<size_t>(idx)); }
 
-    /**
-     * @brief Assignment operator for assigning an integer value to a JSON object.
-     *
-     * This operator assigns the given integer value to the JSON object and returns a reference to the modified object.
-     *
-     * @param l The integer value to assign.
-     * @return A reference to the modified JSON object.
-     */
-    json &operator=(int l) noexcept
-    {
-      value = static_cast<int64_t>(l);
-      return *this;
-    }
-
-    /**
-     * @brief Assigns an int64_t value to the JSON object.
-     *
-     * This assignment operator allows you to assign an int64_t value to a JSON object.
-     *
-     * @param l The int64_t value to assign.
-     * @return A reference to the modified JSON object.
-     */
-    json &operator=(int64_t l) noexcept
-    {
-      value = l;
-      return *this;
-    }
-
-    /**
-     * @brief Assigns an unsigned 64-bit integer value to the JSON object.
-     *
-     * This assignment operator allows you to assign an unsigned 64-bit integer value
-     * to a JSON object. The value is stored in the `value` member variable of the JSON object.
-     *
-     * @param l The unsigned 64-bit integer value to assign.
-     * @return A reference to the modified JSON object.
-     */
-    json &operator=(uint64_t l) noexcept
-    {
-      value = l;
-      return *this;
-    }
-
-    /**
-     * @brief Assigns a double value to the JSON object.
-     *
-     * This assignment operator allows you to assign a double value to a JSON object.
-     *
-     * @param d The double value to assign.
-     * @return A reference to the modified JSON object.
-     */
-    json &operator=(double d) noexcept
-    {
-      value = d;
-      return *this;
-    }
-
-    /**
-     * @brief Accesses the value associated with the specified key in the JSON object.
-     *
-     * This operator allows accessing the value associated with the specified key in the JSON object.
-     * The key is provided as a C-style string.
-     *
-     * @param str The key to access the value.
-     * @return A reference to the value associated with the key.
-     */
-    json &operator[](const char *str) { return std::get<std::map<std::string, json, std::less<>>>(value)[str]; }
-    /**
-     * @brief Accesses the value associated with the specified key in the JSON object.
-     *
-     * This operator allows accessing the value associated with the specified key in the JSON object.
-     * The key is provided as a C-style string.
-     *
-     * @param str The key to access the value.
-     * @return A reference to the value associated with the key.
-     */
-    const json &operator[](const char *str) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(str); }
-
-    /**
-     * @brief Accesses the value associated with the specified key in the JSON object.
-     *
-     * This operator allows you to access the value associated with the specified key in the JSON object.
-     * If the key does not exist, it will be created and associated with a default-constructed JSON value.
-     *
-     * @param key The key to access the value.
-     * @return A reference to the value associated with the key.
-     */
-    json &operator[](std::string_view key) { return std::get<std::map<std::string, json, std::less<>>>(value)[key.data()]; }
-    /**
-     * @brief Accesses the value associated with the specified key in the JSON object.
-     *
-     * This operator allows you to access the value associated with the specified key in the JSON object.
-     * If the key does not exist, it will be created and associated with a default-constructed JSON value.
-     *
-     * @param key The key to access the value.
-     * @return A reference to the value associated with the key.
-     */
-    const json &operator[](std::string_view key) const { return std::get<std::map<std::string, json, std::less<>>>(value).at(key.data()); }
-
-    /**
-     * @brief Accesses the element at the specified index in the JSON object.
-     *
-     * This operator allows accessing the element at the specified index in the JSON object.
-     * The index can be either an integer or a size_t value.
-     *
-     * @param index The index of the element to access.
-     * @return A reference to the element at the specified index.
-     */
-    json &operator[](int index) { return operator[](static_cast<size_t>(index)); }
-    /**
-     * @brief Accesses the element at the specified index in the JSON object.
-     *
-     * This operator allows accessing the element at the specified index in the JSON object.
-     * The index can be either an integer or a size_t value.
-     *
-     * @param index The index of the element to access.
-     * @return A reference to the element at the specified index.
-     */
-    const json &operator[](int index) const { return operator[](static_cast<size_t>(index)); }
-
-    /**
-     * @brief Accesses the element at the specified index in the JSON object.
-     *
-     * This operator allows you to access the element at the specified index in the JSON object.
-     * It returns a reference to the element, allowing you to modify its value if needed.
-     *
-     * @param index The index of the element to access.
-     * @return A reference to the element at the specified index.
-     */
-    json &operator[](size_t index) { return std::get<std::vector<json>>(value)[index]; }
-    /**
-     * @brief Accesses the element at the specified index in the JSON object.
-     *
-     * This operator allows you to access the element at the specified index in the JSON object.
-     * It returns a reference to the element, allowing you to modify its value if needed.
-     *
-     * @param index The index of the element to access.
-     * @return A reference to the element at the specified index.
-     */
-    const json &operator[](size_t index) const { return std::get<std::vector<json>>(value).at(index); }
+    [[nodiscard]] bool operator==(const json &other) const noexcept { return value == other.value; }
+    [[nodiscard]] bool operator!=(const json &other) const noexcept { return !(*this == other); }
 
     /**
      * @brief Checks if the JSON value is null.
@@ -536,184 +318,47 @@ namespace json
      */
     [[nodiscard]] bool contains(std::string_view key) const { return is_object() && std::get<std::map<std::string, json, std::less<>>>(value).count(key) > 0; }
 
-    /**
-     * @brief Overloads the equality operator for comparing two json objects.
-     *
-     * This function compares the value of two json objects and returns true if they are equal, and false otherwise.
-     *
-     * @param other The json object to compare with.
-     * @return true if the two json objects are equal, false otherwise.
-     */
-    [[nodiscard]] bool operator==(const json &other) const noexcept { return value == other.value; }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with a nullptr.
-     *
-     * This function compares the value of the json object with a nullptr and returns true if the value is null, and false otherwise.
-     *
-     * @param nullptr_t A null pointer constant.
-     * @return true if the json object is null, false otherwise.
-     */
-    [[nodiscard]] bool operator==(std::nullptr_t) const noexcept { return value.index() == 0; }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with a boolean value.
-     *
-     * This function compares the value of the json object with a boolean value and returns true if they are equal, and false otherwise.
-     *
-     * @param b The boolean value to compare with.
-     * @return true if the json object is equal to the boolean value, false otherwise.
-     */
-    [[nodiscard]] bool operator==(bool b) const noexcept { return value.index() == 1 && std::get<bool>(value) == b; }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with an integer value.
-     *
-     * This function compares the value of the json object with an integer value and returns true if they are equal, and false otherwise.
-     *
-     * @param l The integer value to compare with.
-     * @return true if the json object is equal to the integer value, false otherwise.
-     */
-    [[nodiscard]] bool operator==(int l) const noexcept
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+    [[nodiscard]] bool operator==(T num) const noexcept
     {
       switch (value.index())
       {
       case 1:
-        return std::get<bool>(value) == static_cast<bool>(l);
+        return std::get<bool>(value) == static_cast<bool>(num);
       case 2:
-        return std::get<int64_t>(value) == static_cast<int64_t>(l);
+        return std::get<int64_t>(value) == static_cast<int64_t>(num);
       case 3:
-        return std::get<uint64_t>(value) == static_cast<uint64_t>(l);
+        return std::get<uint64_t>(value) == static_cast<uint64_t>(num);
       case 4:
-        return std::get<double>(value) == static_cast<double>(l);
+        return std::get<double>(value) == static_cast<double>(num);
       default:
         return false;
       }
     }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with an int64_t value.
-     *
-     * This function compares the value of the json object with an int64_t value and returns true if they are equal, and false otherwise.
-     *
-     * @param l The int64_t value to compare with.
-     * @return true if the json object is equal to the int64_t value, false otherwise.
-     */
-    [[nodiscard]] bool operator==(int64_t l) const noexcept { return value.index() == 2 && std::get<int64_t>(value) == l; }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with an unsigned 64-bit integer value.
-     *
-     * This function compares the value of the json object with an unsigned 64-bit integer value and returns true if they are equal, and false otherwise.
-     *
-     * @param l The unsigned 64-bit integer value to compare with.
-     * @return true if the json object is equal to the unsigned 64-bit integer value, false otherwise.
-     */
-    [[nodiscard]] bool operator==(uint64_t l) const noexcept { return value.index() == 3 && std::get<uint64_t>(value) == l; }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with a double value.
-     *
-     * This function compares the value of the json object with a double value and returns true if they are equal, and false otherwise.
-     *
-     * @param d The double value to compare with.
-     * @return true if the json object is equal to the double value, false otherwise.
-     */
-    [[nodiscard]] bool operator==(double d) const noexcept { return value.index() == 4 && std::get<double>(value) == d; }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with a string.
-     *
-     * This function compares the value of the json object with a string and returns true if they are equal, and false otherwise.
-     *
-     * @param str The string to compare with.
-     * @return true if the json object is equal to the string, false otherwise.
-     */
-    [[nodiscard]] bool operator==(std::string_view str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
-    /**
-     * @brief Overloads the equality operator for comparing a json object with a C-style string.
-     *
-     * This function compares the value of the json object with a C-style string and returns true if they are equal, and false otherwise.
-     *
-     * @param str The C-style string to compare with.
-     * @return true if the json object is equal to the C-style string, false otherwise.
-     */
-    [[nodiscard]] bool operator==(const char *str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == str; }
 
-    /**
-     * @brief Overloads the inequality operator for comparing two json objects.
-     *
-     * This function compares the value of two json objects and returns true if they are not equal, and false otherwise.
-     *
-     * @param other The json object to compare with.
-     * @return true if the two json objects are not equal, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(const json &other) const noexcept { return value != other.value; }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with a nullptr.
-     *
-     * This function compares the value of the json object with a nullptr and returns true if the value is not null, and false otherwise.
-     *
-     * @param nullptr_t A null pointer constant.
-     * @return true if the json object is not null, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(std::nullptr_t) const noexcept { return value.index() != 0; }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with a boolean value.
-     *
-     * This function compares the value of the json object with a boolean value and returns true if they are not equal, and false otherwise.
-     *
-     * @param b The boolean value to compare with.
-     * @return true if the json object is not equal to the boolean value, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(bool b) const noexcept { return value.index() != 1 || std::get<bool>(value) != b; }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with an integer value.
-     *
-     * This function compares the value of the json object with an integer value and returns true if they are not equal, and false otherwise.
-     *
-     * @param l The integer value to compare with.
-     * @return true if the json object is not equal to the integer value, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(int l) const noexcept { return !(*this == l); }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with an int64_t value.
-     *
-     * This function compares the value of the json object with an int64_t value and returns true if they are not equal, and false otherwise.
-     *
-     * @param l The int64_t value to compare with.
-     * @return true if the json object is not equal to the int64_t value, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(int64_t l) const noexcept { return value.index() != 2 || std::get<int64_t>(value) != l; }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with an unsigned 64-bit integer value.
-     *
-     * This function compares the value of the json object with an unsigned 64-bit integer value and returns true if they are not equal, and false otherwise.
-     *
-     * @param l The unsigned 64-bit integer value to compare with.
-     * @return true if the json object is not equal to the unsigned 64-bit integer value, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(uint64_t l) const noexcept { return value.index() != 3 || std::get<uint64_t>(value) != l; }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with a double value.
-     *
-     * This function compares the value of the json object with a double value and returns true if they are not equal, and false otherwise.
-     *
-     * @param d The double value to compare with.
-     * @return true if the json object is not equal to the double value, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(double d) const noexcept { return value.index() != 4 || std::get<double>(value) != d; }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with a string.
-     *
-     * This function compares the value of the json object with a string and returns true if they are not equal, and false otherwise.
-     *
-     * @param str The string to compare with.
-     * @return true if the json object is not equal to the string, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(std::string_view str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
-    /**
-     * @brief Overloads the inequality operator for comparing a json object with a C-style string.
-     *
-     * This function compares the value of the json object with a C-style string and returns true if they are not equal, and false otherwise.
-     *
-     * @param str The C-style string to compare with.
-     * @return true if the json object is not equal to the C-style string, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(const char *str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != str; }
+    template <typename T, std::enable_if_t<std::is_same_v<std::decay_t<T>, std::string> || std::is_same_v<std::decay_t<T>, std::string_view> || std::is_same_v<std::decay_t<T>, const char *>, int> = 0>
+    [[nodiscard]] bool operator==(T &&str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == std::string(str); }
+
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<std::decay_t<T>, bool>, int> = 0>
+    [[nodiscard]] bool operator!=(T num) const noexcept
+    {
+      switch (value.index())
+      {
+      case 1:
+        return std::get<bool>(value) != static_cast<bool>(num);
+      case 2:
+        return std::get<int64_t>(value) != static_cast<int64_t>(num);
+      case 3:
+        return std::get<uint64_t>(value) != static_cast<uint64_t>(num);
+      case 4:
+        return std::get<double>(value) != static_cast<double>(num);
+      default:
+        return true;
+      }
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<std::decay_t<T>, std::string> || std::is_same_v<std::decay_t<T>, std::string_view> || std::is_same_v<std::decay_t<T>, const char *>, int> = 0>
+    [[nodiscard]] bool operator!=(T &&str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != std::string(str); }
 
     /**
      * @brief Conversion operator to bool.
