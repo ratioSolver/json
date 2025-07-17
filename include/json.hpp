@@ -75,6 +75,14 @@ namespace json
      * @param other The json object to be copied.
      */
     json(const json &other) : value(other.value) {}
+    /**
+     * @brief Move constructor for the json class.
+     *
+     * This constructor transfers ownership of the value from another json object to the new json object.
+     *
+     * @param other The json object to be moved.
+     */
+    json(json &&other) noexcept : value(std::move(other.value)) { other.value = nullptr; }
 
     /**
      * @brief Constructs a JSON object from a value of type T.
