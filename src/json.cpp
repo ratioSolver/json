@@ -4,7 +4,7 @@
 
 namespace json
 {
-    json::json(std::initializer_list<json> init)
+    json::json(std::initializer_list<json> init) : value(nullptr)
     {
         if (init.size() == 2 && init.begin()->is_string())
         { // we have a key-value pair..

@@ -47,6 +47,7 @@ namespace json
       switch (type)
       {
       case json_type::null:
+        value = nullptr;
         break;
       case json_type::boolean:
         value = false;
