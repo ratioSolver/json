@@ -196,31 +196,31 @@ namespace json
      *
      * @return true if the JSON value is null, false otherwise.
      */
-    [[nodiscard]] bool is_null() const noexcept { return value.index() == 0; }
+    [[nodiscard]] constexpr bool is_null() const noexcept { return value.index() == 0; }
     /**
      * @brief Checks if the JSON value is a boolean.
      *
      * @return true if the JSON value is a boolean, false otherwise.
      */
-    [[nodiscard]] bool is_boolean() const noexcept { return value.index() == 1; }
+    [[nodiscard]] constexpr bool is_boolean() const noexcept { return value.index() == 1; }
     /**
      * @brief Checks if the JSON value is an integer.
      *
      * @return true if the JSON value is an integer, false otherwise.
      */
-    [[nodiscard]] bool is_integer() const noexcept { return value.index() == 2; }
+    [[nodiscard]] constexpr bool is_integer() const noexcept { return value.index() == 2; }
     /**
      * @brief Checks if the JSON value is an unsigned integer.
      *
      * @return true if the JSON value is an unsigned integer, false otherwise.
      */
-    [[nodiscard]] bool is_unsigned() const noexcept { return value.index() == 3; }
+    [[nodiscard]] constexpr bool is_unsigned() const noexcept { return value.index() == 3; }
     /**
      * @brief Checks if the JSON value is a floating-point number.
      *
      * @return true if the JSON value is a floating-point number, false otherwise.
      */
-    [[nodiscard]] bool is_float() const noexcept { return value.index() == 4; }
+    [[nodiscard]] constexpr bool is_float() const noexcept { return value.index() == 4; }
     /**
      * @brief Checks if the JSON value is a number.
      *
@@ -228,25 +228,25 @@ namespace json
      *
      * @return true if the JSON value is a number, false otherwise.
      */
-    [[nodiscard]] bool is_number() const noexcept { return value.index() == 2 || value.index() == 3 || value.index() == 4; }
+    [[nodiscard]] constexpr bool is_number() const noexcept { return value.index() == 2 || value.index() == 3 || value.index() == 4; }
     /**
      * @brief Checks if the JSON value is a string.
      *
      * @return true if the JSON value is a string, false otherwise.
      */
-    [[nodiscard]] bool is_string() const noexcept { return value.index() == 5; }
+    [[nodiscard]] constexpr bool is_string() const noexcept { return value.index() == 5; }
     /**
      * @brief Checks if the JSON value is an object.
      *
      * @return true if the JSON value is an object, false otherwise.
      */
-    [[nodiscard]] bool is_object() const noexcept { return value.index() == 6; }
+    [[nodiscard]] constexpr bool is_object() const noexcept { return value.index() == 6; }
     /**
      * @brief Checks if the JSON value is an array.
      *
      * @return true if the JSON value is an array, false otherwise.
      */
-    [[nodiscard]] bool is_array() const noexcept { return value.index() == 7; }
+    [[nodiscard]] constexpr bool is_array() const noexcept { return value.index() == 7; }
 
     /**
      * @brief Checks if the JSON value is a primitive type.
@@ -256,7 +256,7 @@ namespace json
      *
      * @return true if the JSON value is a primitive type, false otherwise.
      */
-    [[nodiscard]] bool is_primitive() const noexcept { return is_null() || is_boolean() || is_integer() || is_unsigned() || is_float() || is_string(); }
+    [[nodiscard]] constexpr bool is_primitive() const noexcept { return is_null() || is_boolean() || is_integer() || is_unsigned() || is_float() || is_string(); }
     /**
      * @brief Checks if the JSON value is a structured type.
      *
@@ -264,7 +264,7 @@ namespace json
      *
      * @return true if the JSON value is a structured type (object or array), false otherwise.
      */
-    [[nodiscard]] bool is_structured() const noexcept { return is_object() || is_array(); }
+    [[nodiscard]] constexpr bool is_structured() const noexcept { return is_object() || is_array(); }
 
     /**
      * @brief Returns the type of the JSON value.
@@ -274,7 +274,7 @@ namespace json
      *
      * @return The type of the JSON value.
      */
-    [[nodiscard]] json_type get_type() const noexcept
+    [[nodiscard]] constexpr json_type get_type() const noexcept
     {
       switch (value.index())
       {
@@ -326,6 +326,8 @@ namespace json
      */
     [[nodiscard]] bool contains(std::string_view key) const { return is_object() && std::get<std::map<std::string, json, std::less<>>>(value).count(key) > 0; }
 
+    [[nodiscard]] bool operator==(std::nullptr_t) const noexcept { return value.index() == 0; }
+
     template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
     [[nodiscard]] bool operator==(T num) const noexcept
     {
@@ -347,7 +349,9 @@ namespace json
     template <typename T, std::enable_if_t<std::is_same_v<std::decay_t<T>, std::string> || std::is_same_v<std::decay_t<T>, std::string_view> || std::is_same_v<std::decay_t<T>, const char *>, int> = 0>
     [[nodiscard]] bool operator==(T &&str) const noexcept { return value.index() == 5 && std::get<std::string>(value) == std::string(str); }
 
-    template <typename T, std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<std::decay_t<T>, bool>, int> = 0>
+    [[nodiscard]] bool operator!=(std::nullptr_t) const noexcept { return value.index() != 0; }
+
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
     [[nodiscard]] bool operator!=(T num) const noexcept
     {
       switch (value.index())
@@ -369,6 +373,37 @@ namespace json
     [[nodiscard]] bool operator!=(T &&str) const noexcept { return value.index() != 5 || std::get<std::string>(value) != std::string(str); }
 
     /**
+     * @brief Get the JSON value as the specified type T.
+     *
+     * This templated function provides explicit conversion of the JSON value to type T.
+     * Use this when you want to be explicit about the conversion or when implicit
+     * conversion operators might be ambiguous.
+     *
+     * @tparam T The type to convert the JSON value to.
+     * @return The JSON value converted to type T.
+     */
+    template <typename T>
+    [[nodiscard]] T get() const noexcept
+    {
+      if constexpr (std::is_same_v<T, bool>)
+        return static_cast<bool>(*this);
+      else if constexpr (std::is_integral_v<T> && std::is_signed_v<T>)
+        return static_cast<int64_t>(*this);
+      else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
+        return static_cast<uint64_t>(*this);
+      else if constexpr (std::is_floating_point_v<T>)
+        return static_cast<double>(*this);
+      else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, const char *>)
+        return static_cast<std::string>(*this);
+      else if constexpr (std::is_same_v<T, std::map<std::string, json, std::less<>>>)
+        return static_cast<std::map<std::string, json, std::less<>>>(*this);
+      else if constexpr (std::is_same_v<T, std::vector<json>>)
+        return static_cast<std::vector<json>>(*this);
+      else
+        static_assert(std::is_arithmetic_v<T> || std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, const char *> || std::is_same_v<T, std::map<std::string, json, std::less<>>> || std::is_same_v<T, std::vector<json>>, "Unsupported type for json::get<T>()");
+    }
+
+    /**
      * @brief Conversion operator to bool.
      *
      * This operator converts the JSON value to a boolean value.
@@ -387,7 +422,7 @@ namespace json
       case 3:
         return std::get<uint64_t>(value) != 0;
       case 4:
-        return !std::get<double>(value);
+        return std::get<double>(value) != 0.0;
       case 5:
         return !std::get<std::string>(value).empty();
       case 6:
