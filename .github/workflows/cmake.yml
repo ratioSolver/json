@@ -74,7 +74,7 @@ jobs:
       - name: Build
         run: cmake --build build --config Debug
 
-      - name: Test with address sanitizer
+      - name: Test
         working-directory: build
         run: ctest -C Debug --rerun-failed --output-on-failure -T Test
 
